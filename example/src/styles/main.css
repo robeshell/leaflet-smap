@@ -262,14 +262,93 @@ code {
   white-space: nowrap;
 }
 
-.nav-warn {
-  margin: 8px 0 0;
-  padding: 8px 10px;
+.nav-key {
+  margin-top: 8px;
+  padding: 8px 10px 10px;
   border-radius: 8px;
   background: rgba(240, 180, 41, 0.12);
+}
+
+.nav-key label {
+  display: block;
   font-size: 12px;
+  font-weight: 600;
   line-height: 18px;
   color: #f3cf7a;
+}
+
+.nav-key p {
+  margin: 2px 0 8px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #e6d3a3;
+}
+
+.nav-key a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nav-key-row {
+  display: flex;
+  gap: 6px;
+}
+
+.nav-key-row input {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  font: 12px/18px var(--mono);
+  color: #fff;
+}
+
+.nav-key-row input::placeholder {
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.nav-key-row input:focus {
+  outline: 0;
+  border-color: var(--ink-accent);
+}
+
+.nav-key-row button,
+.nav-key-set button {
+  flex: none;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.nav-key-row button:hover:not(:disabled),
+.nav-key-set button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.nav-key-row button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.nav-key-set {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-muted);
 }
 
 .nav-toggle.btn,

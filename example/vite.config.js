@@ -19,6 +19,8 @@ function proxies(env) {
 }
 
 export default defineConfig(({ mode }) => ({
+  // 相对路径，构建产物放在任意子目录（如 GitHub Pages）下都能用
+  base: './',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),

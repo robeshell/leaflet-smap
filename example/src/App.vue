@@ -33,8 +33,20 @@
           <span>安装 <b>{{ copied ? '已复制' : '点击复制' }}</b></span>
           <code>{{ install }}</code>
         </button>
-        <p v-if="!tdtKey" class="nav-warn">
-          未配置天地图密钥，天地图底图和服务不可用。见 <code>.env.example</code>。
+        <form v-if="!tdtKey" class="nav-key" @submit.prevent="saveTdtKey(keyInput)">
+          <label for="tdt-key">天地图密钥</label>
+          <p>
+            未配置，天地图底图和服务不可用。填入你的密钥即可体验，只保存在这个浏览器里。
+            <a href="https://console.tianditu.gov.cn/api/key" target="_blank" rel="noopener">申请密钥</a>
+          </p>
+          <div class="nav-key-row">
+            <input id="tdt-key" v-model.trim="keyInput" placeholder="粘贴密钥" autocomplete="off" />
+            <button type="submit" :disabled="!keyInput">保存</button>
+          </div>
+        </form>
+        <p v-else-if="tdtKeyFromBrowser" class="nav-key-set">
+          <span>正在使用你填写的天地图密钥</span>
+          <button type="button" @click="saveTdtKey('')">清除</button>
         </p>
       </div>
     </aside>
@@ -52,12 +64,13 @@
 import { copyText } from '@/lib/copy'
 import { ref } from 'vue'
 import groups from './demos'
-import { tdtKey } from './config'
+import { saveTdtKey, tdtKey, tdtKeyFromBrowser } from './config'
 import pkg from '../../packages/core/package.json'
 
 const version = pkg.version
 const install = 'npm i smap-leaflet'
 const navOpen = ref(false)
+const keyInput = ref('')
 const copied = ref(false)
 
 async function copyInstall() {

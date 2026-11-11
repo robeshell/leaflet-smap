@@ -51,7 +51,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import L from 'leaflet'
 import { SMap } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
-import { HEFEI, tdtKey } from '@/config'
+import { BASE_TILES, HEFEI, tdtKey } from '@/config'
 
 const mapEl = ref()
 const keyword = ref('合肥市')
@@ -109,7 +109,7 @@ async function query(value) {
 
 onMounted(() => {
   smap = new SMap(mapEl.value, {
-    tileType: ['TianDiTu.Normal.Map', 'TianDiTu.Normal.Annotion'],
+    tileType: BASE_TILES,
     center: HEFEI,
     zoom: 9,
     minZoom: 3,

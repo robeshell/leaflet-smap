@@ -4,8 +4,8 @@
 
     <section class="block">
       <p class="hint">
-        需要你自己的 GeoServer。默认地址走开发服务器的代理，代理目标在 <code>.env.local</code> 里配置（见
-        <code>.env.example</code>），没配时会加载失败。
+        需要你自己的 GeoServer。本地开发时默认地址走开发服务器的代理，代理目标在 <code>.env.local</code>
+        里配置（见 <code>.env.example</code>）；在线示例里请填你自己的、允许跨域访问的服务地址。
       </p>
     </section>
 

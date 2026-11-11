@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import groups from './demos'
 
 const demos = groups.flatMap((group) =>
@@ -6,7 +6,7 @@ const demos = groups.flatMap((group) =>
 )
 
 export default createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
     ...demos.map((demo) => ({
       path: demo.path,

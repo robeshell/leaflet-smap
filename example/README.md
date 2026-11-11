@@ -1,6 +1,6 @@
 # smap-leaflet 示例
 
-`smap-leaflet` 和 `smap-leaflet-vue` 的本地示例站，Vue 3 + Vite。直接引用 `packages/*/src`，改库代码会热更新。
+`smap-leaflet` 和 `smap-leaflet-vue` 的示例站，Vue 3 + Vite。在线版本：<https://robeshell.github.io/leaflet-smap/>。直接引用 `packages/*/src`，改库代码会热更新。
 
 依赖由仓库根目录统一安装（npm workspaces），不要在这个目录里单独 `npm install`：
 
@@ -33,3 +33,11 @@ src/
 ## 需要自备服务的示例
 
 「WFS / WMS」和「ESRI 图层」需要你自己的 GeoServer / ArcGIS Server。把服务地址写进 `.env.local`（见 `.env.example`），开发服务器会代理过去；没配时这两个示例会显示加载失败。
+
+## 在线版本
+
+推送到 `main` 后由 `.github/workflows/pages.yml` 构建并部署到 GitHub Pages。在线版本和本地有三点不同：
+
+- **没有内置天地图密钥。** 访问者在侧栏底部填自己的密钥，只保存在他的浏览器里（`localStorage`）。没有密钥时，天地图服务类示例的底图退回高德（见 `src/config.js` 的 `BASE_TILES`）。不要把密钥写进仓库或构建流程。
+- **没有代理。** 「WFS / WMS」和「ESRI 图层」要填允许跨域访问的服务地址。
+- **路由用 hash**（`#/basic`），资源用相对路径，所以产物放在任意子目录下都能用。

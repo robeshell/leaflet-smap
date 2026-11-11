@@ -5,6 +5,10 @@
 [![npm](https://img.shields.io/npm/v/smap-leaflet)](https://www.npmjs.com/package/smap-leaflet)
 [![license](https://img.shields.io/npm/l/smap-leaflet)](LICENSE)
 
+**[在线示例](https://robeshell.github.io/leaflet-smap/)**
+
+[![示例站截图：区域遮罩](docs/screenshot.jpg)](https://robeshell.github.io/leaflet-smap/)
+
 | 包                                           | 目录            | 说明                                                                  |
 | :------------------------------------------- | :-------------- | :-------------------------------------------------------------------- |
 | [`smap-leaflet`](packages/core/README.md)    | `packages/core` | 核心库，与框架无关                                                    |
@@ -48,7 +52,7 @@ const smap = new SMap('#map', {
 
 ```bash
 npm install        # 在根目录安装全部工作区的依赖
-npm run example    # 启动示例站 http://localhost:7999
+npm run example    # 在本地启动示例站 http://localhost:7999
 npm run check      # 类型检查 + lint + 格式检查 + 全部单元测试
 npm run build      # 按依赖顺序构建两个包
 ```

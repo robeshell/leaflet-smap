@@ -5,7 +5,8 @@
     <section class="block">
       <p class="hint">
         smap-leaflet 不内置 ArcGIS 支持，但 <code>smap.instance</code> 就是原生的
-        <code>L.Map</code>，可以直接配合 esri-leaflet 使用。默认地址走开发服务器代理，代理目标在 <code>.env.local</code> 里配置。
+        <code>L.Map</code>，可以直接配合 esri-leaflet 使用。本地开发时默认地址走开发服务器代理，代理目标在 <code>.env.local</code>
+        里配置；在线示例里请填你自己的、允许跨域访问的服务地址。
       </p>
     </section>
 
@@ -40,7 +41,7 @@ import L from 'leaflet'
 import { dynamicMapLayer } from 'esri-leaflet'
 import { SMap } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
-import { tdtKey } from '@/config'
+import { BASE_TILES, tdtKey } from '@/config'
 
 const mapEl = ref()
 const url = ref('/arcgis/rest/services')
@@ -73,7 +74,7 @@ async function load() {
 
 onMounted(() => {
   smap = new SMap(mapEl.value, {
-    tileType: ['TianDiTu.Normal.Map', 'TianDiTu.Normal.Annotion'],
+    tileType: BASE_TILES,
     center: [37.42403, 112.43175],
     zoom: 15,
     tdtKey,
