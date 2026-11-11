@@ -1,0 +1,62 @@
+{
+  "name": "leaflet-smap-vue",
+  "version": "0.4.0",
+  "description": "leaflet-smap 的 Vue 3 封装：地图组件、图层组件和组合式函数",
+  "type": "module",
+  "main": "dist/leaflet-smap-vue.cjs",
+  "module": "dist/leaflet-smap-vue.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/leaflet-smap-vue.mjs",
+      "require": "./dist/leaflet-smap-vue.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "llms.txt",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "map",
+    "leaflet",
+    "vue",
+    "vue3",
+    "gis"
+  ],
+  "author": "leaflet-smap contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robeshell/leaflet-smap.git",
+    "directory": "packages/vue"
+  },
+  "homepage": "https://github.com/robeshell/leaflet-smap/tree/main/packages/vue#readme",
+  "bugs": {
+    "url": "https://github.com/robeshell/leaflet-smap/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "ISC",
+  "peerDependencies": {
+    "leaflet-smap": "^2.6.0",
+    "leaflet": "^1.8.0",
+    "vue": "^3.3.0"
+  }
+}

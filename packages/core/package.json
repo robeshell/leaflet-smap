@@ -1,0 +1,76 @@
+{
+  "name": "leaflet-smap",
+  "version": "2.6.0",
+  "description": "基于 Leaflet 的地图库：国内底图、坐标纠偏、测量、绘制与编辑、点聚合、天地图服务",
+  "type": "module",
+  "main": "dist/leaflet-smap.cjs",
+  "module": "dist/leaflet-smap.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/leaflet-smap.mjs",
+      "require": "./dist/leaflet-smap.cjs"
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "llms.txt",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "leaflet",
+    "map",
+    "gis",
+    "tianditu",
+    "gaode",
+    "amap",
+    "gcj02",
+    "coordinate",
+    "measure",
+    "draw",
+    "cluster",
+    "typescript"
+  ],
+  "author": "leaflet-smap contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robeshell/leaflet-smap.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/robeshell/leaflet-smap/tree/main/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/robeshell/leaflet-smap/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "ISC",
+  "peerDependencies": {
+    "leaflet": "^1.8.0"
+  },
+  "dependencies": {
+    "mitt": "^3.0.1",
+    "proj4": "^2.8.0",
+    "proj4leaflet": "^1.0.2"
+  }
+}

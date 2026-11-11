@@ -1,0 +1,15 @@
+node_modules/
+dist/
+
+# 本地环境变量（含天地图密钥）
+.env.local
+.env.*.local
+
+# 含私有 registry 的认证令牌，不入库
+.npmrc
+
+# IDE / 系统
+.idea/
+.vscode/
+.DS_Store
+*.log

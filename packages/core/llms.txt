@@ -1,0 +1,557 @@
+# leaflet-smap
+
+> 基于 Leaflet 1.x 的二次封装地图库。提供国内底图、坐标自动纠偏、测量工具、天地图 Web 服务、WFS/WMS 图层。本文件是给 AI 编码助手的 API 速查，内容与 2.6 代码一致。
+
+## 使用前提
+
+- 安装：`npm install leaflet-smap leaflet`（`leaflet` 是 peerDependency，需 >= 1.8）
+- **必须单独引入样式**，否则地图错位、控件无样式：
+
+```ts
+import { SMap } from 'leaflet-smap'
+import 'leaflet-smap/style.css'
+```
+
+- 容器元素必须有明确的宽高
+- 所有坐标一律传 **WGS-84**，顺序是 Leaflet 的 `[lat, lng]`（纬度在前）。使用高德、百度等底图时库会自动纠偏底图，业务数据不需要手动转换
+- 仅在浏览器环境可用；SSR 框架里要放在客户端生命周期（如 `onMounted` / `useEffect`）中创建
+
+## 最小示例
+
+```ts
+const smap = new SMap('#map', {
+  tileType: 'GaoDe.Normal.Map',
+  center: [31.82, 117.23],
+  zoom: 12,
+})
+
+const map = smap.instance // 原生 L.Map，可直接用任何 Leaflet API
+L.marker([31.82, 117.23]).addTo(map)
+
+// 组件卸载时必须调用
+smap.destroy()
+```
+
+## SMap
+
+### 构造
+
+`new SMap(container: string | HTMLElement, options?: SMapOptions)`
+
+`container` 可以是 `'#map'`、`'map'`（元素 id）或 DOM 元素。
+
+`SMapOptions`（另外支持全部 Leaflet `MapOptions`）：
+
+| 字段 | 类型 | 默认 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `tileType` | `TileType \| TileType[]` | — | 底图类型（内置类型有字面量联合，可自动补全）；数组表示叠加（底图 + 标注） |
+| `center` | `[number, number]` | — | `[lat, lng]` |
+| `zoom` | `number` | `12` | |
+| `minZoom` / `maxZoom` | `number` | — | |
+| `maxNativeZoom` | `number` | — | |
+| `preferCanvas` | `boolean` | `true` | |
+| `tdtKey` | `string` | — | 天地图密钥，只用于 `TianDiTu.*` 底图 |
+| `mapboxToken` | `string` | — | 只用于 `Mapbox.*` 底图 |
+
+默认不带缩放和水印控件，需要的话用 `smap.control.add(...)`。
+
+### 实例成员
+
+| 成员 | 说明 |
+| :-- | :-- |
+| `instance: L.Map` | 底层 Leaflet 地图 |
+| `layer: LayerManager` | 图层登记、WFS / WMS、遮罩、海量点 |
+| `control: ControlManager` | 控件（含底图切换） |
+| `service: ServiceClient` | 天地图 Web 服务 |
+| `contextMenu: ContextMenu` | 右键菜单 |
+| `setTileLayer(type): L.TileLayer[]` | **替换**全部底图 |
+| `addTileLayer(type): L.TileLayer[]` | 在现有底图上叠加 |
+| `clearTileLayers(): void` | 移除全部底图 |
+| `getTileLayers(): L.TileLayer[]` | 当前底图（副本） |
+| `getTileType(): TileType[]` | 当前底图的类型 |
+| `getMeasure(type, options?): Promise<MeasureTool>` | 取得该类型共用的测量工具，**异步** |
+| `createMeasure(type, options?): Promise<MeasureTool>` | 新建一个独立的测量工具，**异步** |
+| `clearMeasures(): void` | 销毁全部测量工具 |
+| `createDraw(options?): Promise<DrawTool>` | 创建绘制 / 编辑工具，**异步** |
+| `locate(options?): Promise<LocateResult>` | 浏览器定位并在地图上标出 |
+| `exportImage(options?): Promise<Blob>` / `downloadImage(filename?, options?)` | 导出当前地图为图片 |
+| `clearLocation(): void` | 移除定位标记 |
+| `setView(center, zoom?): void` | |
+| `fitToLayer(layer): void` | 缩放到图层范围（图层需有 `getBounds`） |
+| `on(type, handler)` / `off(type, handler)` | 事件 |
+| `destroy(): void` | 清理一切并移除地图，可重复调用 |
+
+### 事件
+
+| 事件 | 参数 | 时机 |
+| :-- | :-- | :-- |
+| `loaded` | `L.Map` | 构造后的下一个微任务 |
+| `tileLoaded` | `L.TileLayer[]` | 构造时带 `tileType`（同样延迟到微任务），或每次调用 `setTileLayer` |
+| `measure:created` | `MeasureResult` | 任意测量工具完成一次测量 |
+| `measure:removed` | `{ id, type }` | 一次测量被删除 |
+| `measure:updating` | `MeasureResult` | 一次测量正在被拖动调整 |
+| `measure:updated` | `MeasureResult` | 一次测量在编辑后保存 |
+| `measure:start` | `{ type }` | 测量工具开始绘制 |
+| `measure:stop` | `{ type, completed }` | 测量工具结束绘制（画完或取消） |
+
+监听必须在 `new SMap(...)` 之后**同步**注册；`await` 之后再注册会错过 `loaded`。Leaflet 原生事件用 `smap.instance.on('click', ...)`。
+
+## 底图类型
+
+格式为 `提供商.分组.类型`，区分大小写。注意标注层的拼写是 **`Annotion`**（不是 Annotation）。
+
+| 提供商 | 可用类型 | 备注 |
+| :-- | :-- | :-- |
+| 天地图 | `TianDiTu.Normal.Map` `TianDiTu.Normal.Annotion` `TianDiTu.Satellite.Map` `TianDiTu.Satellite.Annotion` `TianDiTu.Terrain.Map` `TianDiTu.Terrain.Annotion` | 需要 `tdtKey`；`Map` 不含文字，通常与同组 `Annotion` 叠加 |
+| 高德 | `GaoDe.Normal.Map` `GaoDe.Satellite.Map` `GaoDe.Satellite.Annotion` `GaoDe.Brief.Map` | |
+| 谷歌 | `Google.Normal.Map` `Google.Satellite.Map` `Google.Satellite.Annotion` | |
+| Geoq | `Geoq.Normal.Map` `Geoq.Normal.PurplishBlue` `Geoq.Normal.Gray` `Geoq.Normal.Warm` `Geoq.Theme.Hydro` | |
+| 百度 | `Baidu.Normal.Map` `Baidu.Satellite.Map` `Baidu.Satellite.Annotion` `BaiduV3.Normal.Map` | 必须同时传 `crs: L.CRS.Baidu` |
+| 腾讯 | `Tencent.Normal.Map` `Tencent.Satellite.Map` `Tencent.Terrain.Map` | |
+| OSM | `OSM.Normal.Map` | |
+| Mapbox | `Mapbox.Satellite.Map` | 需要 `mapboxToken` |
+
+传入不存在的类型会抛 `Unknown tile provider: xxx`。
+
+```ts
+// 天地图影像 + 标注
+new SMap('#map', {
+  tileType: ['TianDiTu.Satellite.Map', 'TianDiTu.Satellite.Annotion'],
+  tdtKey: 'your-key',
+  center: [31.82, 117.23],
+})
+
+// 运行时切换
+smap.setTileLayer('GaoDe.Satellite.Map')
+```
+
+## 测量工具
+
+```ts
+const measure = await smap.getMeasure('polyline', { showMarker: true }) // 必须 await
+measure.enable()   // 开始一次绘制；画完自动结束，再画需再次 enable()
+measure.disable()  // 取消正在进行的绘制，已完成的图形保留
+measure.measuring  // 是否正在绘制
+measure.clearAll() // 清除该工具画过的全部图形
+measure.destroy()  // 销毁该工具
+```
+
+- 类型：`'polyline'` 测距、`'polygon'` 测面、`'circle'` 测圆、`'rectangle'` 测矩形
+- **`getMeasure(type, options)`**：每种类型在一张地图上共用一个工具，首次调用时创建，`options` 只在创建时生效。绝大多数场景用它，可以在每次点击按钮时直接调用。
+- **`createMeasure(type, options)`**：每次调用都新建一个独立的工具。只在需要同类型多套样式时用，并且要自己保存返回值复用；**不要在每次点击时调用它**，否则工具会越积越多。
+- 两者都返回 Promise，必须 `await`
+- `showMarker` 默认不开，不开则地图上**不显示测量结果**，绝大多数场景应传 `true`
+- 同一地图上可同时存在多个工具，互不干扰
+
+`MeasureOptions`：
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `showMarker` | `boolean` | 在地图上显示结果标签（带 × 删除按钮） |
+| `shapeOptions` | `L.PathOptions` | 图形样式；顶点、标签的颜色跟随 `color`（默认 `#1f6feb`） |
+| `icon` | `L.DivIcon` | 顶点图标 |
+| `formatLabel` | `(label) => string` | 自定义标签文字 |
+
+`formatLabel` 收到 `{ type, distance?, area?, radius?, center?, latlngs, partial }`。`partial: true` 是测距过程中各节点上的累计值，`false` 是最终结果；起点固定显示「起点」，不经过它。
+
+```ts
+formatLabel: (label) =>
+  label.type === 'polyline'
+    ? `${(label.distance / 1000).toFixed(2)} 公里`
+    : `${(label.area / 10000).toFixed(2)} 公顷`
+```
+
+单位（只影响默认文字，`formatLabel` 优先）：`lengthUnit: 'auto' | 'm' | 'km'`，`areaUnit: 'auto' | 'm2' | 'km2' | 'ha'（公顷）| 'mu'（亩）`。运行时切换用 `measure.setOptions({ areaUnit: 'mu' })`，地图上已有的标签会重画。自己要格式化数值时用导出的 `formatLength(m, unit)` / `formatArea(m2, unit)`。
+
+编辑已有结果：`measure.startEdit()` 后用户可以拖手柄调整，`result` 里的数值和地图上的标签实时跟着变，每拖一下触发 `updating`；`measure.finishEdit()` 保存并触发 `updated`，`finishEdit(false)` 还原；`measure.undo()` 撤销上一步。`measure.editing` 表示是否在编辑。界面上要实时显示数值就监听 `updating`。
+
+吸附：`snap: true` 让新的测量贴到之前量过的图形的顶点和边上；`snap: { distance: 16, layers: () => [...] }` 调距离或加上别的图层。
+
+旧选项 `valueFormatter` 已弃用（各工具下参数含义不一致），新代码不要用。
+
+事件和结果，拿数值用它们，不要去解析地图上的文字：
+
+```ts
+measure.on('created', (result) => {
+  // result: { id, type, distance?, area?, perimeter?, radius?, center?, latlngs, layer }
+  // distance 单位米（polyline）；area 平方米、perimeter 周长米（polygon / rectangle / circle）；radius 单位米（circle）
+})
+measure.on('removed', ({ id, type }) => {})
+measure.on('updating', (result) => {}) // 编辑时每拖一下
+measure.on('updated', (result) => {}) // 编辑后保存
+measure.on('start', ({ type }) => {})
+measure.on('stop', ({ type, completed }) => {}) // 画完或取消都会触发；按 Esc 取消时 completed 为 false
+measure.getResults()      // MeasureResult[]，当前还在地图上的
+measure.remove(result.id) // 删除某一次
+
+// 不区分工具，在地图上统一监听
+smap.on('measure:created', (result) => {})
+smap.on('measure:removed', ({ id, type }) => {})
+smap.on('measure:start', ({ type }) => {})
+smap.on('measure:stop', ({ type, completed }) => {})
+```
+
+要让按钮在测量结束后恢复原状，监听 `stop`（或 `measure:stop`）。
+
+## 绘制与编辑
+
+测量工具只负责量，要让用户画图形、改图形、拿到 GeoJSON 用这个：
+
+```ts
+const draw = await smap.createDraw({ shapeOptions: { color: '#0e7490' } }) // 必须 await
+
+draw.draw('polygon')   // 'marker' | 'polyline' | 'polygon' | 'rectangle' | 'circle'；画完一个自动结束
+draw.cancel()          // 放弃正在画的
+draw.drawing           // 正在画的类型，或 null
+
+draw.startEdit()       // 进入编辑模式（拖顶点、移动标记、调整圆）
+draw.undo()            // 撤销上一步，返回是否撤销了；Ctrl/⌘+Z 同效
+draw.canUndo           // boolean
+draw.finishEdit()      // 保存；finishEdit(false) 放弃修改
+draw.editing           // boolean
+
+draw.toGeoJSON()       // FeatureCollection，WGS-84
+draw.load(geojson)     // 载入并替换现有图形；load(geojson, { replace: false }) 追加
+draw.getLayers()       // L.Layer[]
+draw.remove(layer)
+draw.clear()
+draw.group             // 装着全部图形的 L.FeatureGroup，可用于 smap.fitToLayer(draw.group)
+draw.destroy()         // smap.destroy() 时会自动调用
+```
+
+事件（`draw.on(type, handler)` / `draw.off`）：
+
+| 事件 | 参数 | 时机 |
+| :-- | :-- | :-- |
+| `drawstart` / `drawstop` | `{ type }` | 开始画 / 结束画（画完或取消都会触发 `drawstop`） |
+| `created` | `{ layer, type }` | 画完一个图形 |
+| `editing` | `{ layer }` | 编辑时每一步（拖动中、撤销后）；用它刷新 `canUndo` 或实时预览 |
+| `edited` | `{ layers }` | 编辑后保存，只含改动过的图形 |
+| `removed` | `{ layers }` | `remove` / `clear` |
+| `change` | `FeatureCollection` | 以上任何一种变化之后，以及 `load` 之后 |
+
+- 需要实时同步数据时监听 `change` 就够了，不用分别监听。
+- 圆在 GeoJSON 里是 `Point` 加 `properties.radius`（米）；`load` 遇到带 `radius` 的点会还原成圆。矩形导出后是普通 `Polygon`。
+- 用户的操作方式（写界面提示语时用得到）：点＝单击；线＝逐点单击，双击 / 再点最后一个点 / Enter 结束；面＝逐点单击，点第一个点 / 双击 / Enter 闭合；矩形和圆＝按住拖动，或单击两次。Backspace 撤销上一个点，Esc 取消。测量工具相同。
+- 编辑模式：拖顶点改形状，拖边中点插入顶点，单击顶点删除；矩形拖四角缩放、拖中心移动；圆拖圆心移动、拖边上的点改半径；标记直接拖。
+- 吸附：`smap.createDraw({ snap: true })`，绘制和编辑时光标靠近已有图形的顶点或边会贴上去（顶点优先）。画相邻地块、需要公共边界对齐时必须开。`snap: { distance: 16, layers: () => [otherLayer] }` 可调距离、可吸附到其他图层。默认关闭。
+- 一张地图同一时刻只有一次绘制：开始新的绘制或测量会取消正在进行的那个。
+- 跟随鼠标的提示文字可改：`import { sketchText } from 'leaflet-smap'`，给字段赋值即可。
+- 绘制和编辑是库自己实现的，**不需要也不要安装 leaflet-draw**，不依赖全局 `L`。
+- 表单场景的典型写法：`draw.load(已保存的 geojson)` → `draw.startEdit()` → 用户改完 `draw.finishEdit()` → `draw.toGeoJSON()` 提交。
+
+## 图层 `smap.layer`
+
+### 按 id 管理
+
+```ts
+smap.layer.add('roads', layer)                      // 登记并显示；同 id 会先移除旧的。返回传入的 layer
+smap.layer.add('roads', layer, { visible: false })  // 只登记不显示
+smap.layer.toggle('roads')                          // 切换，返回切换后的可见性；toggle(id, true) 指定
+smap.layer.show('roads') / smap.layer.hide('roads') // hide 保留登记
+smap.layer.remove('roads')                          // 移除并取消登记
+smap.layer.get('roads') / has / isVisible / ids() / clear()
+```
+
+对不存在的 id，`show` / `hide` / `remove` / `toggle` 返回 `false`，`get` 返回 `undefined`，不抛错。任何 Leaflet 图层都可以登记。`smap.destroy()` 会清掉全部登记的图层。需要图层开关面板时用这套 API，不要自己维护一份图层 Map。
+
+### WFS / WMS
+
+```ts
+// WFS：请求 GeoServer 并加到地图上，返回 L.GeoJSON
+const layer = await smap.layer.addWFS({
+  url: 'http://host/geoserver/wfs',
+  layer: 'workspace:layerName',
+  id: 'parcels',               // 可选，登记到 smap.layer
+  style: { color: '#f00', weight: 2 },
+  cql_filter: "code='340100'", // url/layer/style/outputFormat/id 以外的字段作为请求参数透传
+})
+
+// 分步
+const data = await smap.layer.loadWFS({ url, layer })            // 只取 GeoJSON
+const geo = smap.layer.createGeoJsonLayer(data, { color: '#f00' }) // 只创建，不添加
+
+// WMS：返回 L.TileLayer.WMS
+const wms = smap.layer.addWMS({ url: 'http://host/geoserver/wms', layer: 'workspace:layerName', id: 'wms' })
+const detached = smap.layer.createWMS({ url, layer })             // 只创建，不添加
+```
+
+WMS 默认 `format: 'image/png'`、`transparent: true`、`crs: L.CRS.EPSG4326`。
+
+### 区域遮罩
+
+```ts
+// 压暗区域以外的部分。geojson 是 Polygon / MultiPolygon 的 Feature、FeatureCollection 或 Geometry，WGS-84
+smap.layer.addMask(geojson, {
+  id: 'mask',          // 建议传，再次 addMask 同 id 时自动替换
+  fillColor: '#000',   // 默认
+  fillOpacity: 0.5,    // 默认
+  outline: true,       // 画区域边界，默认 true
+  color: '#3388ff',    // 边界颜色
+  weight: 2,
+  fit: true,           // 添加后缩放到该区域，默认 true
+  restrict: false,     // true 时限制地图只能在该区域内拖动；遮罩移除后自动解除
+})
+smap.layer.remove('mask')
+```
+
+`createMask(geojson, options)` 只创建不添加（`fit` / `restrict` 仅 `addMask` 生效）。没有多边形的 GeoJSON 会抛错。
+
+### 海量点
+
+```ts
+// 全部画在一张 canvas 上，上万个点也流畅。超过几百个点时用它，不要循环创建 L.marker
+smap.layer.addPoints(devices, {           // 点：[lat, lng]，或任何带 lat / lng 的对象
+  id: 'devices',
+  radius: 3,                              // 像素，默认 4
+  style: (d, i) => ({ fillColor: d.online ? '#0a0' : '#c00' }), // 也可传固定的 L.CircleMarkerOptions
+  tooltip: (d) => d.name,
+  onClick: (d, event) => select(d),
+})
+```
+
+返回 `L.FeatureGroup`。数据变了就用同一个 `id` 重新 `addPoints`。没有 `tooltip` 和 `onClick` 时点不响应鼠标，性能更好。`createPointLayer` 只创建不添加。
+
+### 点聚合
+
+```ts
+// 点很密、缩小后分不清时用它：挤在一起的点合并成带数量的气泡，放大后散开
+const cluster = smap.layer.addCluster(devices, {
+  id: 'devices',
+  clusterRadius: 60,            // 像素，默认 60
+  disableClusteringAtZoom: 16,  // 从这个级别起不再聚合
+  radius: 5,                    // 以下几项针对未被聚合的单个点，含义同 addPoints
+  style: (d) => ({ fillColor: d.online ? '#0a0' : '#c00' }),
+  tooltip: (d) => d.name,
+  onClick: (d, event) => {},
+  onClusterClick: (points, event) => {}, // 不传则点击气泡放大到它的范围
+})
+cluster.setPoints(next) // 换数据
+```
+
+返回 `ClusterLayer`（`L.FeatureGroup` 的子类）。`addPoints` 和 `addCluster` 怎么选：要看清每个点的分布用 `addPoints`；要看「这一片有多少个」用 `addCluster`。气泡是 HTML 元素，颜色用 CSS 变量 `--smap-cluster` 改；`createCluster` 只创建不添加。
+
+## 控件 `smap.control`
+
+```ts
+smap.control.add('zoom', { position: 'topright' })
+smap.control.add('scale', { position: 'bottomleft' })
+smap.control.add('attribution', { prefix: '© My App', content: '自定义水印' })
+
+// 底图切换控件：点击切换，自动高亮当前底图（包括代码里调 setTileLayer 之后）
+smap.control.add('layers', {
+  position: 'topright',
+  options: [
+    { label: '矢量', tileType: 'GaoDe.Normal.Map' },
+    { label: '影像', tileType: ['GaoDe.Satellite.Map', 'GaoDe.Satellite.Annotion'] },
+  ],
+})
+
+// 业务图层开关：操作的是 smap.layer 的登记表，和代码里的 show / hide / toggle 双向同步
+smap.control.add('overlays', {
+  title: '图层',
+  items: [{ id: 'roads', label: '道路' }], // id 是登记时用的 id；不传 items 则列出全部
+})
+
+smap.control.remove('zoom')
+smap.control.removeAll()
+```
+
+类型只有 `'attribution' | 'zoom' | 'scale' | 'layers' | 'overlays'`；同一类型重复 `add` 会替换旧的。`layers` 切的是底图，`overlays` 开关的是业务图层，不要混。`overlays` 里列出但还没登记的图层显示为禁用，登记后自动可用。需要自己画图层面板时监听 `smap.layer.onChange(fn)`。
+
+## 右键菜单 `smap.contextMenu`
+
+```ts
+// 地图的菜单。项：{ text, onClick?, disabled?, danger? }，或 '-' 表示分隔线
+smap.contextMenu.setItems([
+  { text: '在此处居中', onClick: ({ latlng, map }) => map.panTo(latlng) },
+  '-',
+  { text: '删除全部', danger: true, disabled: !hasData, onClick: clearAll },
+])
+smap.contextMenu.setItems((ctx) => [...]) // 传函数则每次右键时生成
+smap.contextMenu.setItems(null)           // 取消，恢复浏览器默认菜单
+
+// 单个图层的菜单；右键该图层时只出现它自己的菜单
+const unbind = smap.contextMenu.bind(marker, [
+  { text: '删除', danger: true, onClick: ({ layer }) => layer.remove() },
+])
+smap.contextMenu.unbind(marker)
+smap.contextMenu.hide()
+```
+
+`onClick` 的参数是 `{ latlng, containerPoint, map, layer? }`，`layer` 只在图层菜单里有。不需要再引入 leaflet-contextmenu。
+
+## 定位
+
+```ts
+try {
+  // 浏览器定位（WGS-84）：画出位置点和精度圈，并移动地图
+  const { latlng, latitude, longitude, accuracy } = await smap.locate({
+    zoom: 16,         // 默认至少 16
+    setView: true,    // 默认
+    marker: true,     // 默认
+    timeout: 3000,    // 默认 3000 ms
+    enableHighAccuracy: false,
+  })
+} catch (e) {
+  // 用户拒绝授权、超时、不可用，e.message 是中文说明
+}
+smap.clearLocation()
+```
+
+浏览器定位需要 HTTPS 或 localhost。只想要坐标不动地图时用独立函数 `getLocation()`。城市级粗略定位、不想弹授权框时用 `smap.service.getLocationByIp()`。
+
+## 导出图片
+
+```ts
+const blob = await smap.exportImage({ type: 'image/png', scale: 2, background: '#fff' }) // 选项都可省
+await smap.downloadImage('map.png', { type: 'image/png' })                              // 直接下载
+```
+
+- **图里有**：底图、矢量图形（线、面、圆、`addPoints` 的点），以及库自己的标签——测量标签、聚合气泡、`createDraw` 画的标记。`labels: false` 不画标签。
+- **图里没有**：其他 HTML 元素——自定义图标的 `L.marker`、弹窗、悬停提示、控件。结构简单的自定义标签（有背景、圆角、一行文字的方块）可以用 `include: ['.my-label']` 画进去；图片图标和复杂布局不行。
+- 底图服务要允许跨域读取，否则 reject（错误信息里有域名）。高德、天地图、腾讯、OSM 可以；谷歌不行。
+- 会先等底图加载完，所以可以在 `setView` 之后直接调用。
+
+## 天地图服务 `smap.service`
+
+`smap.service` 已绑定地图和 `tdtKey`：创建地图时传了 `tdtKey` 就**不需要**再传 `tk`（传了则以 `tk` 为准）。没有 key 时调用会抛 `TianDiTu key is missing`。返回值是天地图接口的原始 JSON，带类型。
+
+```ts
+// POI 搜索，范围 = 地图当前视野
+const res = await smap.service.search({ keyword: '合肥南站', count: 10, start: 0 })
+// res: { count?, pois?: { name, address?, phone?, lonlat: 'lng,lat' }[], status: { infocode, cndesc } }
+// 无结果时没有 pois 字段，要用 res.pois ?? []
+
+// 地址 → 坐标
+const geo = await smap.service.geocode({ keyWord: '安徽省合肥市' })
+// geo: { status: '0', msg, location?: { lon: string, lat: string, level?, score? } }  ← lon/lat 是字符串
+
+// 坐标 → 地址
+const rev = await smap.service.reverseGeocode({ lon: 117.23, lat: 31.82 })
+// rev: { status: '0', msg, result?: { formatted_address, location: { lon, lat }, addressComponent: { province, city, county, town, road, poi, ... } } }
+
+// 行政区划（v2 接口）
+const adm = await smap.service.getAdministrative({ keyword: '合肥市', childLevel: 1, extensions: false })
+// adm: { status: 200, message, data?: { district: { gb, pgb, name, center: { lng, lat }, level, boundary?, children? }[] } }
+
+// IP 定位，无参数、无需 key
+const ip = await smap.service.getLocationByIp()
+// ip: { code, msg, data?: { province, city, gb, lat: string, lng: string } }
+```
+
+- 参数名不统一（天地图原样）：搜索是 `keyword`，地理编码是 `keyWord`，逆地理编码是 `lon` / `lat`，行政区划是 `keyword`。
+- 行政区划的 `keyword` 传名称，或 **9 位**区划码（`156` + 6 位码，如 `156340100`）；传 6 位码查不到。`childLevel` 0–3 控制返回几级下级，`extensions: true` 才返回边界（WKT 字符串）。
+- 各接口的成功标志不同：搜索看 `status.infocode === 1000`，地理编码 / 逆地理编码看 `status === '0'`，行政区划看 `status === 200`。
+- 天地图返回的坐标都是 WGS-84，可直接用于地图。
+- 脱离地图使用：`new ServiceClient({ key })`，此时 `search` 必须传 `level` 和 `mapBound: 'minLng,minLat,maxLng,maxLat'`。
+
+## 独立工具函数
+
+```ts
+import {
+  wgs84ToGcj02, gcj02ToWgs84, gcj02ToBd09, bd09ToGcj02, wgs84ToBd09, bd09ToWgs84,
+  transformCoord, transformGeoJSON,
+  getLocation, loadScript, loadStyle,
+} from 'leaflet-smap'
+
+const { lng, lat } = wgs84ToGcj02(117.23, 31.82) // 入参是 (lng, lat)，返回 { lng, lat } 对象
+transformCoord(117.23, 31.82, 'bd09', 'wgs84')   // 任意两种坐标系之间：'wgs84' | 'gcj02' | 'bd09'
+
+// 整份 GeoJSON 一次转完（Feature / FeatureCollection / Geometry 均可），返回深拷贝
+const wgs = transformGeoJSON(gcjData, 'gcj02', 'wgs84')
+
+const pos = await getLocation({ enableHighAccuracy: true, timeout: 3000 }) // { latitude, longitude, accuracy }
+
+await loadScript('https://example.com/lib.js') // 返回 Promise，按 URL 去重
+loadStyle('https://example.com/style.css')     // 同步，无返回值
+```
+
+坐标转换函数的参数顺序是 **`(lng, lat)`**，与 Leaflet 的 `[lat, lng]` 相反。
+
+**什么时候要转换数据**：底图是哪种坐标系都不用管（库会纠偏底图）；只有**数据本身**不是 WGS-84 时才要转，例如高德 / 腾讯 API 返回的坐标（GCJ-02）、百度 API 返回的坐标（BD-09）。天地图和浏览器定位返回的已经是 WGS-84。
+
+## 自定义底图
+
+```ts
+import { registerProvider, getTileTypes } from 'leaflet-smap'
+
+registerProvider('Intranet', {
+  layers: { Satellite: { Map: 'https://tiles{s}.example.com/{z}/{x}/{y}.png?token={key}' } },
+  subdomains: ['1', '2', '3'], // 替换 {s}
+  coordType: 'gcj02',          // 'wgs84'（默认）| 'gcj02' | 'bd09'，非 WGS-84 会自动纠偏
+  tms: false,                  // y 轴是否反向
+  key: 'xxx',                  // 替换 {key}
+})
+smap.setTileLayer('Intranet.Satellite.Map') // 类型名 = 提供商.分组.类型
+```
+
+要在创建使用该底图的地图**之前**注册。用内置提供商名注册会整体覆盖内置定义。`getTileTypes()` 返回当前全部可用类型字符串。
+
+## 高级导出
+
+`LayerManager`、`ControlManager`、`ServiceClient`、`ContextMenu`、`DrawTool`、`ClusterLayer`、`formatLength`、`formatArea`、`BaseMeasureTool`、`sketchText`、`geodesicArea`、`pathLength`、`PolylineMeasure`、`PolygonMeasure`、`CircleMeasure`、`RectangleMeasure`、`providers`、`getCoordType`、`getTileTypes`、`registerProvider`、`BUILTIN_TILE_TYPES`、`createChinaTileLayer(type, { key?, zIndex? })`。
+
+类型：`SMapOptions`、`SMapEvents`、`DrawType`、`DrawOptions`、`DrawEvents`、`MaskOptions`、`PointInput`、`PointLayerOptions`、`ContextMenuItem`、`ContextMenuItems`、`ContextMenuContext`、`ControlType`、`LayersControlOptions`、`LocateOptions`、`LocateResult`、`TileType`、`BuiltinTileType`、`TileProviderDefinition`、`MeasureResult`、`MeasureLabel`、`LengthUnit`、`AreaUnit`、`SnapOptions`、`ClusterOptions`、`OverlaysControlOptions`、`ExportImageOptions`、`MeasureEvents`、`TdtSearchResult`、`TdtPoi`、`TdtGeocodeResult`、`TdtReverseGeocodeResult`、`TdtAdministrativeResult`、`TdtDistrict`、`TdtIpLocationResult`、`MeasureOptions`、`MeasureType`、`MeasureTool`、`WFSOptions`、`WMSOptions`、`SearchParams`、`GeocodeParams`、`ReverseGeocodeParams`、`AdministrativeParams`、`AttributionOptions`、`ControlOptions`、`LocationOptions`、`LocationResult`、`CoordType`、`Coord`。
+
+## 常见错误
+
+| 错误写法 | 正确写法 |
+| :-- | :-- |
+| `import { map, utils } from 'leaflet-smap'`（1.x 写法） | `import { SMap } from 'leaflet-smap'` |
+| 忘记引入样式 | `import 'leaflet-smap/style.css'` |
+| `const m = smap.getMeasure('polyline')` | `const m = await smap.getMeasure('polyline')` |
+| 每次点击按钮都 `createMeasure(...)` | `getMeasure(...)`，或把 `createMeasure` 的返回值存起来复用 |
+| 监听 `draw:created` / `draw:drawstop` 等 leaflet-draw 事件 | 这些事件已不存在。用工具的 `created` / `stop`，或 `smap.on('measure:created' \| 'measure:stop', ...)` |
+| 安装或引入 `leaflet-draw` | 不需要，绘制是内置的 |
+| `valueFormatter: (v) => ...` | `formatLabel: (label) => ...` |
+| `smap.layer.getGeoJson` / `createWFSLayer` / `createWMSLayer` | `loadWFS` / `addWFS` / `createGeoJsonLayer` / `addWMS` / `createWMS` |
+| `smap.control.addZoom()` / `addScale()` | `smap.control.add('zoom')` / `add('scale')` |
+| `const [lng, lat] = wgs84ToGcj02(...)` | `const { lng, lat } = wgs84ToGcj02(...)` |
+| `'TianDiTu.Normal.Annotation'` | `'TianDiTu.Normal.Annotion'` |
+| `'Mapbox.Normal.Map'` | `'Mapbox.Satellite.Map'` |
+| 为高德底图手动把业务数据转成 GCJ-02 | 直接传 WGS-84，库会纠偏底图 |
+| `smap.service.search(smap.instance, { keyword, tk })`（2.0 写法，仍可用但已弃用） | `smap.service.search({ keyword })` |
+| `getAdministrative({ searchWord: '340100' })` | `getAdministrative({ keyword: '156340100' })` |
+| 解析地图上的测量文字，或用 `valueFormatter` 截取数值 | `measure.on('created', (result) => ...)` |
+| `center: [117.23, 31.82]`（经度在前） | `center: [31.82, 117.23]`（纬度在前） |
+| 循环创建上千个 `L.marker` | `smap.layer.addPoints(points, options)`，要聚合用 `addCluster` |
+| 引入 leaflet.markercluster | `smap.layer.addCluster(points, options)` |
+| 引入 html2canvas / leaflet-image 截图 | `smap.exportImage()`（注意不含 HTML 元素） |
+| 引入 leaflet-contextmenu / 自己写遮罩插件 | `smap.contextMenu`、`smap.layer.addMask()` |
+| 把高德 / 百度 API 返回的坐标直接上图 | 先 `transformGeoJSON(data, 'gcj02', 'wgs84')` 或 `transformCoord` |
+| `const d = smap.createDraw()` | `const d = await smap.createDraw()` |
+| 自己用 Map 维护图层的显示隐藏 | `smap.layer.add(id, layer)` + `toggle(id)` |
+| 组件卸载时不清理 | 调用 `smap.destroy()` |
+
+## Vue 3 模板
+
+Vue 3 项目优先用配套的 `leaflet-smap-vue`（`<SMapView>` 组件、`useMeasure` / `useDraw`），它的说明在 `node_modules/leaflet-smap-vue/llms.txt`。不想加这个依赖时按下面的方式直接用核心库：
+
+```vue
+<template>
+  <div ref="el" style="width: 100%; height: 600px" />
+</template>
+
+<script setup lang="ts">
+import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { SMap } from 'leaflet-smap'
+import 'leaflet-smap/style.css'
+
+const el = ref<HTMLElement>()
+let smap: SMap | undefined
+
+onMounted(() => {
+  smap = new SMap(el.value!, {
+    tileType: 'GaoDe.Normal.Map',
+    center: [31.82, 117.23],
+    zoom: 12,
+  })
+  smap.control.add('zoom')
+})
+
+onBeforeUnmount(() => smap?.destroy())
+</script>
+```
+
+不要把 `smap` 或 `smap.instance` 放进 `ref()` / `reactive()`，Vue 的深层代理会破坏 Leaflet 内部状态；用普通变量或 `shallowRef`。

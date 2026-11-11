@@ -1,0 +1,344 @@
+/* ============ 测量与绘制 ============
+ * 线和面的颜色由 JS 里的 shapeOptions 决定；顶点、提示、标签这些 DOM 元素
+ * 通过 --smap-accent 跟随当前工具的颜色（工具开始绘制时写到地图容器上）。
+ */
+
+.leaflet-container {
+  --smap-accent: #1f6feb;
+}
+
+/* 正在绘制：十字光标 */
+.leaflet-container.smap-drawing,
+.leaflet-container.smap-drawing .leaflet-interactive {
+  cursor: crosshair;
+}
+
+/* 顶点手柄：白底圆点加一圈强调色。外层 14px 是点击范围，圆点画在伪元素里 */
+.smap-vertex {
+  border: 0;
+  background: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    box-sizing: border-box;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border: 2.5px solid var(--smap-accent);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
+    transition: transform 0.1s;
+  }
+
+  &.leaflet-interactive:hover::after {
+    transform: scale(1.25);
+  }
+}
+
+/* 边的中点：拖它可以插入一个顶点。比顶点小且半透明，表示「还不是顶点」 */
+.smap-vertex--mid::after {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-width: 2px;
+  opacity: 0.6;
+}
+
+.smap-vertex--mid:hover::after {
+  opacity: 1;
+}
+
+/* 整体移动：实心 */
+.smap-vertex--move {
+  cursor: move;
+
+  &::after {
+    border-color: #fff;
+    background: var(--smap-accent);
+  }
+}
+
+.smap-vertex--resize {
+  cursor: nwse-resize;
+}
+
+/* 吸附提示：光标吸到的位置上套一个空心圈 */
+.smap-vertex--snap::after {
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-width: 2px;
+  background: color-mix(in srgb, var(--smap-accent) 18%, transparent);
+  box-shadow: none;
+}
+
+/* 编辑模式下可拖动的标记：同色光晕 */
+.smap-marker-editing {
+  cursor: move;
+  outline: 4px solid color-mix(in srgb, var(--smap-accent) 32%, transparent);
+  border-radius: 50%;
+}
+
+/* 跟随鼠标的操作提示 */
+.smap-draw-hint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(17, 24, 28, 0.88);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  line-height: 18px;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+
+  &.is-error {
+    background: #c5221f;
+  }
+}
+
+.smap-draw-hint-sub {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* 测量标签挂在一个不可见的标记上 */
+.measure-div-icon {
+  background: transparent;
+  border: none;
+}
+
+.leaflet-tooltip.measure-tooltip {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  pointer-events: auto;
+
+  &::before {
+    display: none;
+  }
+}
+
+/* 途经点的累计值：白底小标签 */
+.smap-measure-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.16);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  color: #1f2a30;
+  white-space: nowrap;
+}
+
+/* 最终结果：强调色底，带删除按钮 */
+.smap-measure-label--result {
+  padding: 3px 3px 3px 10px;
+  background: var(--smap-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  font-weight: 600;
+  color: #fff;
+}
+
+.smap-measure-remove {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  font: 400 14px/1 inherit;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.38);
+  }
+}
+
+.leaflet-tile {
+  outline: 0 !important;
+  border: none !important;
+}
+
+.leaflet-zoom-animated img {
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+}
+
+/* 底图切换控件 */
+.smap-layers.leaflet-bar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+
+  .smap-layers-item {
+    padding: 6px 12px;
+    border: 0;
+    border-bottom: 1px solid #e3e6e8;
+    background: #fff;
+    font: 12px/18px inherit;
+    color: #333;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    &:hover {
+      background: #f4f6f7;
+    }
+
+    &.is-active {
+      background: #e8f1ff;
+      color: #1058c7;
+      font-weight: 600;
+    }
+  }
+}
+
+/* 点聚合的气泡：强调色实心圆加一圈同色光晕，数量越多越大 */
+.smap-cluster {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--smap-cluster, #1f6feb) 26%, transparent);
+  cursor: pointer;
+
+  span {
+    display: grid;
+    place-items: center;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    border-radius: 50%;
+    background: var(--smap-cluster, #1f6feb);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: #fff;
+    transition: transform 0.12s;
+  }
+
+  &:hover span {
+    transform: scale(1.08);
+  }
+}
+
+.smap-cluster--l span {
+  font-size: 13px;
+}
+
+/* 业务图层开关 */
+.smap-overlays.leaflet-bar {
+  min-width: 132px;
+  padding: 6px 0;
+  background: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  color: #333;
+
+  &.is-empty {
+    display: none;
+  }
+
+  .smap-overlays-title {
+    padding: 2px 12px 6px;
+    font-weight: 600;
+  }
+
+  .smap-overlays-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      background: #f4f6f7;
+    }
+
+    input {
+      margin: 0;
+      accent-color: var(--smap-accent, #1f6feb);
+    }
+
+    input:disabled + span {
+      color: #9aa0a6;
+    }
+  }
+}
+
+/* 右键菜单 */
+.smap-contextmenu {
+  position: absolute;
+  z-index: 1100;
+  min-width: 140px;
+  padding: 4px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 6px 16px rgba(0, 0, 0, 0.18);
+
+  .smap-contextmenu-item {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    font: 13px/20px inherit;
+    color: #222;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #f1f3f5;
+    }
+
+    &:disabled {
+      color: #9aa0a6;
+      cursor: not-allowed;
+    }
+
+    &.is-danger:not(:disabled) {
+      color: #c5221f;
+    }
+  }
+
+  .smap-contextmenu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: #e3e6e8;
+  }
+}
+
+/* 绘制工具的默认标记 */
+.smap-draw-marker {
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--smap-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
