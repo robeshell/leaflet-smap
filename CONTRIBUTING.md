@@ -68,12 +68,18 @@ lint、格式化配置和大部分开发依赖放在根目录，两个包共用�
 1. 在该包的 `CHANGELOG.md` 中把「未发布」改成版本号和日期，确认变更条目完整。
 2. 升级版本号：`npm version patch|minor|major -w <包名> --no-git-tag-version`，然后提交。
    - 修 bug → patch；向后兼容的新功能 → minor；不兼容的改动 → major。
-3. 发布：`npm publish -w <包名>`。`prepublishOnly` 会先跑类型检查、测试和构建，任何一步失败都不会发出去。
-4. 打 tag 并推送。核心库沿用 `v2.1.0` 这样的格式，Vue 包用 `vue-v0.1.0`。
+3. 等 `main` 上的 CI 通过后打 tag 并推送，发布由 `.github/workflows/release.yml` 自动完成。核心库的 tag 是 `v2.6.1` 这样的格式，Vue 包是 `vue-v0.4.1`：
+
+   ```bash
+   git tag v2.6.1 && git push origin v2.6.1
+   ```
+
+   工作流会核对 tag 和 `package.json` 的版本号是否一致，跑完整检查后再发布，任何一步失败都不会发出去。
 
 注意事项：
 
-- **两个包都要发时，先发 core。** `vue` 包的 `peerDependencies` 声明了它需要的 core 版本范围，用到 core 的新 API 时要同步调高。
-- 发布 `vue` 前要先构建 core（`npm run build`），它的类型声明依赖 core 的产物。
+- **两个包都要发时，先发 core。** `vue` 包的 `peerDependencies` 声明了它需要的 core 版本范围，用到 core 的新 API 时要同步调高。等 core 的发布工作流成功后再推 Vue 包的 tag。
 
-两个包发布到公共 npm（需要先 `npm login`，并且对包有发布权限）。
+发布用的是 npm 的 [Trusted Publishing](https://docs.npmjs.com/trusted-publishers)：npm 只认这个仓库的 `release.yml`，仓库里不存任何令牌。所以这个文件不能改名；改名后要到 npmjs.com 上两个包的设置里重新配置受信任的发布者。
+
+需要手动发布时（比如工作流不可用）：`npm publish -w <包名>`，要先 `npm login` 并且对包有发布权限。`prepublishOnly` 会先跑类型检查、测试和构建；发布 `vue` 前要先构建 core（`npm run build`），它的类型声明依赖 core 的产物。

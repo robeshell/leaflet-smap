@@ -1,0 +1,40 @@
+name: Release
+
+# 推送 tag 即发布到 npm：v2.6.1 发 smap-leaflet，vue-v0.4.1 发 smap-leaflet-vue。
+# 用 npm 的 Trusted Publishing（OIDC）认证，不需要令牌，也不需要验证码。
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'vue-v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - name: 由 tag 确定要发布的包，并核对版本号
+        id: pkg
+        run: |
+          case "$GITHUB_REF_NAME" in
+            vue-v*) name=smap-leaflet-vue; dir=packages/vue; version="${GITHUB_REF_NAME#vue-v}" ;;
+            v*) name=smap-leaflet; dir=packages/core; version="${GITHUB_REF_NAME#v}" ;;
+          esac
+          actual=$(node -p "require('./$dir/package.json').version")
+          if [ "$actual" != "$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME 对应版本 $version，但 $dir/package.json 里是 $actual"
+            exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+      - run: npm ci
+      - run: npm run check
+      - run: npm publish -w ${{ steps.pkg.outputs.name }}
