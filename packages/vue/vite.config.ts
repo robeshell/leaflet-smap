@@ -7,11 +7,11 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       formats: ['es', 'cjs'],
-      fileName: (format) => `leaflet-smap-vue.${format === 'es' ? 'mjs' : 'cjs'}`,
+      fileName: (format) => `smap-leaflet-vue.${format === 'es' ? 'mjs' : 'cjs'}`,
     },
     rollupOptions: {
       // 都由使用方提供，不打进产物
-      external: ['vue', 'leaflet', 'leaflet-smap'],
+      external: ['vue', 'leaflet', 'smap-leaflet'],
     },
     outDir: 'dist',
     sourcemap: true,

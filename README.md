@@ -1,27 +1,27 @@
-# leaflet-smap
+# smap-leaflet
 
 基于 [Leaflet](https://leafletjs.com/) 的地图库及其 Vue 3 封装：国内底图、坐标自动纠偏、测量、绘制与编辑、点聚合、天地图服务。
 
-[![npm](https://img.shields.io/npm/v/leaflet-smap)](https://www.npmjs.com/package/leaflet-smap)
-[![license](https://img.shields.io/npm/l/leaflet-smap)](LICENSE)
+[![npm](https://img.shields.io/npm/v/smap-leaflet)](https://www.npmjs.com/package/smap-leaflet)
+[![license](https://img.shields.io/npm/l/smap-leaflet)](LICENSE)
 
 | 包                                           | 目录            | 说明                                                                  |
 | :------------------------------------------- | :-------------- | :-------------------------------------------------------------------- |
-| [`leaflet-smap`](packages/core/README.md)    | `packages/core` | 核心库，与框架无关                                                    |
-| [`leaflet-smap-vue`](packages/vue/README.md) | `packages/vue`  | Vue 3 封装：`<SMapView>` 等组件和 `useMeasure` / `useDraw` 组合式函数 |
+| [`smap-leaflet`](packages/core/README.md)    | `packages/core` | 核心库，与框架无关                                                    |
+| [`smap-leaflet-vue`](packages/vue/README.md) | `packages/vue`  | Vue 3 封装：`<SMapView>` 等组件和 `useMeasure` / `useDraw` 组合式函数 |
 | 示例站                                       | `example`       | 两个包的示例，直接引用源码                                            |
 
 ## 安装
 
 ```bash
-npm install leaflet-smap leaflet
+npm install smap-leaflet leaflet
 # Vue 3 项目可以再装
-npm install leaflet-smap-vue
+npm install smap-leaflet-vue
 ```
 
 ```ts
-import { SMap } from 'leaflet-smap'
-import 'leaflet-smap/style.css'
+import { SMap } from 'smap-leaflet'
+import 'smap-leaflet/style.css'
 
 const smap = new SMap('#map', {
   tileType: 'GaoDe.Normal.Map',

@@ -10,8 +10,8 @@ import {
   watch,
 } from 'vue'
 import type { PropType } from 'vue'
-import { SMap } from 'leaflet-smap'
-import type { MeasureResult, SMapOptions, TileType } from 'leaflet-smap'
+import { SMap } from 'smap-leaflet'
+import type { MeasureResult, SMapOptions, TileType } from 'smap-leaflet'
 import { SMAP_KEY, createSMapRef } from './context'
 
 type Center = [number, number]

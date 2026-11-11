@@ -8,7 +8,7 @@
 
 ### 变更
 
-- 包名改为 `leaflet-smap-vue`，依赖的核心库改为 `leaflet-smap`。API 不变。
+- 包名改为 `smap-leaflet-vue`，依赖的核心库改为 `smap-leaflet`。API 不变。
 
 ## [0.3.0] - 2026-11-11
 
@@ -17,7 +17,7 @@
 - `useDraw` 新增 `canUndo`、`undo`；`useMeasure` 新增 `undo`。
 - `useMeasure` 的 `results` 在编辑拖动过程中实时更新。
 
-需要 `leaflet-smap` >= 2.5.0（撤销、吸附、`updating` 事件都在其中）。
+需要 `smap-leaflet` >= 2.5.0（撤销、吸附、`updating` 事件都在其中）。
 
 ## [0.2.0] - 2026-11-11
 
@@ -29,13 +29,13 @@
 - `<SMapControl type="overlays">`：业务图层开关。
 - `useMeasure` 新增 `editing`、`startEdit`、`finishEdit`、`setOptions`。
 
-需要 `leaflet-smap` >= 2.4.0（自研绘制引擎、聚合、测量编辑都在其中）。
+需要 `smap-leaflet` >= 2.4.0（自研绘制引擎、聚合、测量编辑都在其中）。
 
 ## [0.1.1] - 2026-11-11
 
 ### 变更
 
-- `useMeasure` 改用测量工具自己的 `stop` 事件判断测量结束，不再监听 leaflet-draw 的内部事件。需要 `leaflet-smap` >= 2.3.0。
+- `useMeasure` 改用测量工具自己的 `stop` 事件判断测量结束，不再监听 leaflet-draw 的内部事件。需要 `smap-leaflet` >= 2.3.0。
 
 ## [0.1.0] - 2026-11-11
 

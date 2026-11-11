@@ -1,22 +1,22 @@
 {
-  "name": "leaflet-smap-monorepo",
+  "name": "smap-leaflet-monorepo",
   "private": true,
   "type": "module",
-  "description": "leaflet-smap 及其 Vue 封装",
+  "description": "smap-leaflet 及其 Vue 封装",
   "workspaces": [
     "packages/*",
     "example"
   ],
   "scripts": {
-    "build": "npm run build -w leaflet-smap && npm run build -w leaflet-smap-vue",
+    "build": "npm run build -w smap-leaflet && npm run build -w smap-leaflet-vue",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run test --workspaces --if-present",
-    "check": "npm run build -w leaflet-smap && npm run typecheck && npm run lint && npm run format:check && npm run test",
-    "example": "npm run dev -w leaflet-smap-example"
+    "check": "npm run build -w smap-leaflet && npm run typecheck && npm run lint && npm run format:check && npm run test",
+    "example": "npm run dev -w smap-leaflet-example"
   },
   "engines": {
     "node": ">=18"

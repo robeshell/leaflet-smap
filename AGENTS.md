@@ -6,8 +6,8 @@
 
 npm workspaces 管理的 monorepo，两个发布在 npm 上的包加一个示例站：
 
-- `packages/core` → `leaflet-smap`：基于 Leaflet 1.x 的地图库，与框架无关。TypeScript，Vite 库模式构建。
-- `packages/vue` → `leaflet-smap-vue`：上面那个包的 Vue 3 封装。纯 `.ts`（`defineComponent` + `h`），没有 `.vue` 文件。
+- `packages/core` → `smap-leaflet`：基于 Leaflet 1.x 的地图库，与框架无关。TypeScript，Vite 库模式构建。
+- `packages/vue` → `smap-leaflet-vue`：上面那个包的 Vue 3 封装。纯 `.ts`（`defineComponent` + `h`），没有 `.vue` 文件。
 - `example` → 示例站，通过 alias 直接引用两个包的源码。
 
 ## 命令
@@ -23,7 +23,7 @@ npm run format     # Prettier 格式化
 npm run build      # 按顺序构建 core、vue
 npm run example    # 启动示例站（端口 7999），改源码即时生效
 
-npm run test -w leaflet-smap-vue   # 只操作一个包
+npm run test -w smap-leaflet-vue   # 只操作一个包
 ```
 
 `packages/vue` 的类型检查和构建读取的是 `packages/core/dist` 里的类型声明，所以**改了 core 的公开类型后要先构建 core**（`npm run check` 已经包含这一步）。它的测试则通过 alias 直接跑 core 的源码，不依赖构建。

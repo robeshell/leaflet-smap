@@ -127,7 +127,7 @@ import {
   SMapPoints,
   SMapView,
   useMeasure,
-} from 'leaflet-smap-vue'
+} from 'smap-leaflet-vue'
 import DemoPage from '@/components/DemoPage.vue'
 import { HEFEI } from '@/config'
 import { formatArea, formatDistance } from '@/lib/format'

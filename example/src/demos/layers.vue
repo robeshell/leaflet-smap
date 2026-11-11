@@ -33,7 +33,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import L from 'leaflet'
-import { SMap } from 'leaflet-smap'
+import { SMap } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { HEFEI } from '@/config'
 import { pin } from '@/lib/pin'

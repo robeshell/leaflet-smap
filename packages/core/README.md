@@ -1,4 +1,4 @@
-<h1 align="center">leaflet-smap</h1>
+<h1 align="center">smap-leaflet</h1>
 <p align="center">
   <strong>基于 Leaflet.js 二次封装的地图库</strong><br>
   TypeScript 编写 · 支持国内主流底图 · 坐标纠偏 · 测量工具 · 天地图服务 · WFS/WMS 图层
@@ -30,7 +30,7 @@
 ## 安装
 
 ```bash
-npm install leaflet-smap leaflet
+npm install smap-leaflet leaflet
 ```
 
 > `leaflet` 为 peerDependency，需要手动安装
@@ -42,8 +42,8 @@ npm install leaflet-smap leaflet
 ```
 
 ```ts
-import { SMap } from 'leaflet-smap'
-import 'leaflet-smap/style.css'
+import { SMap } from 'smap-leaflet'
+import 'smap-leaflet/style.css'
 
 const smap = new SMap('#map', {
   tileType: 'GaoDe.Normal.Map',
@@ -269,7 +269,7 @@ await smap.createDraw({ snap: { distance: 16, layers: () => [parcelLayer] } })
 提示文字可以改写：
 
 ```ts
-import { sketchText } from 'leaflet-smap'
+import { sketchText } from 'smap-leaflet'
 
 sketchText.polyline.start = 'Click to start the line'
 ```
@@ -542,7 +542,7 @@ smap.off('loaded', handler)
 ### 坐标转换工具
 
 ```ts
-import { wgs84ToGcj02, gcj02ToWgs84, gcj02ToBd09, bd09ToGcj02 } from 'leaflet-smap'
+import { wgs84ToGcj02, gcj02ToWgs84, gcj02ToBd09, bd09ToGcj02 } from 'smap-leaflet'
 
 const { lng, lat } = wgs84ToGcj02(117.23, 31.82)
 ```
@@ -563,7 +563,7 @@ const { lng, lat } = wgs84ToGcj02(117.23, 31.82)
 地图上的数据必须是 WGS-84。第三方给的 GCJ-02 / BD-09 数据先转一遍：
 
 ```ts
-import { transformGeoJSON, transformCoord } from 'leaflet-smap'
+import { transformGeoJSON, transformCoord } from 'smap-leaflet'
 
 const wgs = transformGeoJSON(gcjData, 'gcj02', 'wgs84') // 返回深拷贝，不改动原数据
 const { lng, lat } = transformCoord(117.23, 31.82, 'bd09', 'wgs84')
@@ -574,7 +574,7 @@ const { lng, lat } = transformCoord(117.23, 31.82, 'bd09', 'wgs84')
 ### 工具函数
 
 ```ts
-import { getLocation, loadScript, loadStyle } from 'leaflet-smap'
+import { getLocation, loadScript, loadStyle } from 'smap-leaflet'
 
 // HTML5 定位
 const pos = await getLocation({ enableHighAccuracy: true })
@@ -601,7 +601,7 @@ smap.destroy()
 ### 注册自定义底图
 
 ```ts
-import { registerProvider } from 'leaflet-smap'
+import { registerProvider } from 'smap-leaflet'
 
 registerProvider('Intranet', {
   layers: {
@@ -622,14 +622,14 @@ smap.setTileLayer('Intranet.Satellite.Map')
 直接使用子模块：
 
 ```ts
-import { LayerManager, ControlManager, ServiceClient, createChinaTileLayer } from 'leaflet-smap'
+import { LayerManager, ControlManager, ServiceClient, createChinaTileLayer } from 'smap-leaflet'
 ```
 
 ---
 
 ## 配合 Vue 使用
 
-Vue 3 项目可以直接用 [`leaflet-smap-vue`](../vue/README.md)，它把地图、图层、控件包装成组件，把测量和绘制包装成组合式函数。
+Vue 3 项目可以直接用 [`smap-leaflet-vue`](../vue/README.md)，它把地图、图层、控件包装成组件，把测量和绘制包装成组合式函数。
 
 ## 开发
 
@@ -637,15 +637,15 @@ Vue 3 项目可以直接用 [`leaflet-smap-vue`](../vue/README.md)，它把地�
 
 ## 给 AI 助手
 
-- [llms.txt](llms.txt)：API 速查，随包发布（`node_modules/leaflet-smap/llms.txt`）。在业务项目里让 AI 写地图代码时，把它加进上下文。
+- [llms.txt](llms.txt)：API 速查，随包发布（`node_modules/smap-leaflet/llms.txt`）。在业务项目里让 AI 写地图代码时，把它加进上下文。
 - [AGENTS.md](../../AGENTS.md)：在本仓库里改代码的 AI 需要遵守的约定和已知的坑。
 
 ## 产出
 
 | 文件                    | 说明                |
 | :---------------------- | :------------------ |
-| `dist/leaflet-smap.mjs` | ESM 格式            |
-| `dist/leaflet-smap.cjs` | CJS 格式            |
+| `dist/smap-leaflet.mjs` | ESM 格式            |
+| `dist/smap-leaflet.cjs` | CJS 格式            |
 | `dist/style.css`        | 样式文件            |
 | `dist/index.d.ts`       | TypeScript 类型定义 |
 

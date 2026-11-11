@@ -1,16 +1,16 @@
 {
-  "name": "leaflet-smap",
+  "name": "smap-leaflet",
   "version": "2.6.0",
   "description": "基于 Leaflet 的地图库：国内底图、坐标纠偏、测量、绘制与编辑、点聚合、天地图服务",
   "type": "module",
-  "main": "dist/leaflet-smap.cjs",
-  "module": "dist/leaflet-smap.mjs",
+  "main": "dist/smap-leaflet.cjs",
+  "module": "dist/smap-leaflet.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/leaflet-smap.mjs",
-      "require": "./dist/leaflet-smap.cjs"
+      "import": "./dist/smap-leaflet.mjs",
+      "require": "./dist/smap-leaflet.cjs"
     },
     "./style.css": "./dist/style.css",
     "./package.json": "./package.json"

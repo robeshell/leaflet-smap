@@ -1,15 +1,15 @@
-# leaflet-smap
+# smap-leaflet
 
 > 基于 Leaflet 1.x 的二次封装地图库。提供国内底图、坐标自动纠偏、测量工具、天地图 Web 服务、WFS/WMS 图层。本文件是给 AI 编码助手的 API 速查，内容与 2.6 代码一致。
 
 ## 使用前提
 
-- 安装：`npm install leaflet-smap leaflet`（`leaflet` 是 peerDependency，需 >= 1.8）
+- 安装：`npm install smap-leaflet leaflet`（`leaflet` 是 peerDependency，需 >= 1.8）
 - **必须单独引入样式**，否则地图错位、控件无样式：
 
 ```ts
-import { SMap } from 'leaflet-smap'
-import 'leaflet-smap/style.css'
+import { SMap } from 'smap-leaflet'
+import 'smap-leaflet/style.css'
 ```
 
 - 容器元素必须有明确的宽高
@@ -236,7 +236,7 @@ draw.destroy()         // smap.destroy() 时会自动调用
 - 编辑模式：拖顶点改形状，拖边中点插入顶点，单击顶点删除；矩形拖四角缩放、拖中心移动；圆拖圆心移动、拖边上的点改半径；标记直接拖。
 - 吸附：`smap.createDraw({ snap: true })`，绘制和编辑时光标靠近已有图形的顶点或边会贴上去（顶点优先）。画相邻地块、需要公共边界对齐时必须开。`snap: { distance: 16, layers: () => [otherLayer] }` 可调距离、可吸附到其他图层。默认关闭。
 - 一张地图同一时刻只有一次绘制：开始新的绘制或测量会取消正在进行的那个。
-- 跟随鼠标的提示文字可改：`import { sketchText } from 'leaflet-smap'`，给字段赋值即可。
+- 跟随鼠标的提示文字可改：`import { sketchText } from 'smap-leaflet'`，给字段赋值即可。
 - 绘制和编辑是库自己实现的，**不需要也不要安装 leaflet-draw**，不依赖全局 `L`。
 - 表单场景的典型写法：`draw.load(已保存的 geojson)` → `draw.startEdit()` → 用户改完 `draw.finishEdit()` → `draw.toGeoJSON()` 提交。
 
@@ -453,7 +453,7 @@ import {
   wgs84ToGcj02, gcj02ToWgs84, gcj02ToBd09, bd09ToGcj02, wgs84ToBd09, bd09ToWgs84,
   transformCoord, transformGeoJSON,
   getLocation, loadScript, loadStyle,
-} from 'leaflet-smap'
+} from 'smap-leaflet'
 
 const { lng, lat } = wgs84ToGcj02(117.23, 31.82) // 入参是 (lng, lat)，返回 { lng, lat } 对象
 transformCoord(117.23, 31.82, 'bd09', 'wgs84')   // 任意两种坐标系之间：'wgs84' | 'gcj02' | 'bd09'
@@ -474,7 +474,7 @@ loadStyle('https://example.com/style.css')     // 同步，无返回值
 ## 自定义底图
 
 ```ts
-import { registerProvider, getTileTypes } from 'leaflet-smap'
+import { registerProvider, getTileTypes } from 'smap-leaflet'
 
 registerProvider('Intranet', {
   layers: { Satellite: { Map: 'https://tiles{s}.example.com/{z}/{x}/{y}.png?token={key}' } },
@@ -498,8 +498,8 @@ smap.setTileLayer('Intranet.Satellite.Map') // 类型名 = 提供商.分组.类�
 
 | 错误写法 | 正确写法 |
 | :-- | :-- |
-| `import { map, utils } from 'leaflet-smap'`（1.x 写法） | `import { SMap } from 'leaflet-smap'` |
-| 忘记引入样式 | `import 'leaflet-smap/style.css'` |
+| `import { map, utils } from 'smap-leaflet'`（1.x 写法） | `import { SMap } from 'smap-leaflet'` |
+| 忘记引入样式 | `import 'smap-leaflet/style.css'` |
 | `const m = smap.getMeasure('polyline')` | `const m = await smap.getMeasure('polyline')` |
 | 每次点击按钮都 `createMeasure(...)` | `getMeasure(...)`，或把 `createMeasure` 的返回值存起来复用 |
 | 监听 `draw:created` / `draw:drawstop` 等 leaflet-draw 事件 | 这些事件已不存在。用工具的 `created` / `stop`，或 `smap.on('measure:created' \| 'measure:stop', ...)` |
@@ -526,7 +526,7 @@ smap.setTileLayer('Intranet.Satellite.Map') // 类型名 = 提供商.分组.类�
 
 ## Vue 3 模板
 
-Vue 3 项目优先用配套的 `leaflet-smap-vue`（`<SMapView>` 组件、`useMeasure` / `useDraw`），它的说明在 `node_modules/leaflet-smap-vue/llms.txt`。不想加这个依赖时按下面的方式直接用核心库：
+Vue 3 项目优先用配套的 `smap-leaflet-vue`（`<SMapView>` 组件、`useMeasure` / `useDraw`），它的说明在 `node_modules/smap-leaflet-vue/llms.txt`。不想加这个依赖时按下面的方式直接用核心库：
 
 ```vue
 <template>
@@ -535,8 +535,8 @@ Vue 3 项目优先用配套的 `leaflet-smap-vue`（`<SMapView>` 组件、`useMe
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
-import { SMap } from 'leaflet-smap'
-import 'leaflet-smap/style.css'
+import { SMap } from 'smap-leaflet'
+import 'smap-leaflet/style.css'
 
 const el = ref<HTMLElement>()
 let smap: SMap | undefined

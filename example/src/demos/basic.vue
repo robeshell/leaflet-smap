@@ -51,7 +51,7 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { SMap } from 'leaflet-smap'
+import { SMap } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { HEFEI } from '@/config'
 import { fixed } from '@/lib/format'
@@ -82,7 +82,7 @@ function syncView() {
 
 function toggle(type) {
   if (controls[type]) {
-    smap.control.add(type, type === 'attribution' ? { content: 'leaflet-smap 示例' } : undefined)
+    smap.control.add(type, type === 'attribution' ? { content: 'smap-leaflet 示例' } : undefined)
   } else {
     smap.control.remove(type)
   }

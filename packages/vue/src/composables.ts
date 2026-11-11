@@ -8,7 +8,7 @@ import type {
   MeasureResult,
   MeasureTool,
   MeasureType,
-} from 'leaflet-smap'
+} from 'smap-leaflet'
 import { resolveSMap } from './context'
 import type { SMapSource } from './context'
 

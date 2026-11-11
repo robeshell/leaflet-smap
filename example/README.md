@@ -1,6 +1,6 @@
-# leaflet-smap 示例
+# smap-leaflet 示例
 
-`leaflet-smap` 和 `leaflet-smap-vue` 的本地示例站，Vue 3 + Vite。直接引用 `packages/*/src`，改库代码会热更新。
+`smap-leaflet` 和 `smap-leaflet-vue` 的本地示例站，Vue 3 + Vite。直接引用 `packages/*/src`，改库代码会热更新。
 
 依赖由仓库根目录统一安装（npm workspaces），不要在这个目录里单独 `npm install`：
 

@@ -13,7 +13,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'LeafletSMap',
       formats: ['es', 'cjs'],
-      fileName: (format) => `leaflet-smap.${format === 'es' ? 'mjs' : 'cjs'}`,
+      fileName: (format) => `smap-leaflet.${format === 'es' ? 'mjs' : 'cjs'}`,
     },
     rollupOptions: {
       external: ['leaflet', 'proj4', 'proj4leaflet'],

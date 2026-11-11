@@ -44,7 +44,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import L from 'leaflet'
-import { SMap, transformGeoJSON } from 'leaflet-smap'
+import { SMap, transformGeoJSON } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { formatDistance } from '@/lib/format'
 

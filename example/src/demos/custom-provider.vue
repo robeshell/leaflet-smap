@@ -38,7 +38,7 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { SMap, getTileTypes, registerProvider } from 'leaflet-smap'
+import { SMap, getTileTypes, registerProvider } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { HEFEI } from '@/config'
 

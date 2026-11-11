@@ -1,16 +1,16 @@
 {
-  "name": "leaflet-smap-vue",
+  "name": "smap-leaflet-vue",
   "version": "0.4.0",
-  "description": "leaflet-smap 的 Vue 3 封装：地图组件、图层组件和组合式函数",
+  "description": "smap-leaflet 的 Vue 3 封装：地图组件、图层组件和组合式函数",
   "type": "module",
-  "main": "dist/leaflet-smap-vue.cjs",
-  "module": "dist/leaflet-smap-vue.mjs",
+  "main": "dist/smap-leaflet-vue.cjs",
+  "module": "dist/smap-leaflet-vue.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/leaflet-smap-vue.mjs",
-      "require": "./dist/leaflet-smap-vue.cjs"
+      "import": "./dist/smap-leaflet-vue.mjs",
+      "require": "./dist/smap-leaflet-vue.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -55,7 +55,7 @@
   },
   "license": "ISC",
   "peerDependencies": {
-    "leaflet-smap": "^2.6.0",
+    "smap-leaflet": "^2.6.0",
     "leaflet": "^1.8.0",
     "vue": "^3.3.0"
   }

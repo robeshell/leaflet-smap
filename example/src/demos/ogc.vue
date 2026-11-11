@@ -51,7 +51,7 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { SMap } from 'leaflet-smap'
+import { SMap } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { HEFEI } from '@/config'
 

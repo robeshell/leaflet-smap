@@ -54,7 +54,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import L from 'leaflet'
-import { SMap, wgs84ToBd09, wgs84ToGcj02 } from 'leaflet-smap'
+import { SMap, wgs84ToBd09, wgs84ToGcj02 } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { tdtKey } from '@/config'
 import { pin } from '@/lib/pin'

@@ -1,17 +1,17 @@
-# leaflet-smap-vue
+# smap-leaflet-vue
 
-> `leaflet-smap` 的 Vue 3 封装。提供 `<SMapView>` 地图组件、图层 / 控件组件，以及 `useMeasure`、`useDraw` 组合式函数。本文件是给 AI 编码助手的 API 速查。核心库的 API（底图类型、天地图服务、右键菜单等）见 `node_modules/leaflet-smap/llms.txt`。
+> `smap-leaflet` 的 Vue 3 封装。提供 `<SMapView>` 地图组件、图层 / 控件组件，以及 `useMeasure`、`useDraw` 组合式函数。本文件是给 AI 编码助手的 API 速查。核心库的 API（底图类型、天地图服务、右键菜单等）见 `node_modules/smap-leaflet/llms.txt`。
 
 ## 安装
 
 ```bash
-npm install leaflet-smap-vue leaflet-smap leaflet
+npm install smap-leaflet-vue smap-leaflet leaflet
 ```
 
-三者都要装：本包只是一层封装，`leaflet-smap`（>= 2.6.0）、`leaflet`、`vue`（>= 3.3）是 peerDependency。样式来自核心库，在入口引入一次：
+三者都要装：本包只是一层封装，`smap-leaflet`（>= 2.6.0）、`leaflet`、`vue`（>= 3.3）是 peerDependency。样式来自核心库，在入口引入一次：
 
 ```ts
-import 'leaflet-smap/style.css'
+import 'smap-leaflet/style.css'
 ```
 
 ## 快速上手
@@ -28,7 +28,7 @@ import 'leaflet-smap/style.css'
 
 <script setup lang="ts">
 import { ref, shallowRef } from 'vue'
-import { SMapView, SMapControl, SMapGeoJson } from 'leaflet-smap-vue'
+import { SMapView, SMapControl, SMapGeoJson } from 'smap-leaflet-vue'
 
 const center = ref<[number, number]>([31.82, 117.23]) // [纬度, 经度]
 const zoom = ref(12)
@@ -179,8 +179,8 @@ finishEdit() // 保存；finishEdit(false) 放弃
 
 <script setup lang="ts">
 import { shallowRef } from 'vue'
-import type { SMap } from 'leaflet-smap'
-import { SMapView, useMeasure } from 'leaflet-smap-vue'
+import type { SMap } from 'smap-leaflet'
+import { SMapView, useMeasure } from 'smap-leaflet-vue'
 
 const smap = shallowRef<SMap | null>(null)
 const measure = useMeasure({ smap }) // 也可以传 getter：() => viewRef.value?.smap
@@ -223,7 +223,7 @@ smap.layer.addWMS({ url, layer, id: 'wms' })
 | 错误写法 | 正确写法 |
 | :-- | :-- |
 | `<SMapView>` 的父元素没有高度，地图不显示 | 给父元素明确的高度 |
-| 忘记引入样式 | `import 'leaflet-smap/style.css'`（来自核心库） |
+| 忘记引入样式 | `import 'smap-leaflet/style.css'`（来自核心库） |
 | 把 `<SMapGeoJson>` 等写在 `<SMapView>` 外面 | 必须写在它的默认插槽里 |
 | 在 `<SMapView>` 所在的同一个组件里调 `useSMap()` | 该组件不在插槽内；用 `@ready` 拿实例，或把逻辑放进子组件 |
 | 在地图旁边的组件里直接 `useMeasure()` | `useMeasure({ smap })`，`smap` 是存着实例的 `shallowRef` |

@@ -4,7 +4,7 @@
 
     <section class="block">
       <p class="hint">
-        leaflet-smap 不内置 ArcGIS 支持，但 <code>smap.instance</code> 就是原生的
+        smap-leaflet 不内置 ArcGIS 支持，但 <code>smap.instance</code> 就是原生的
         <code>L.Map</code>，可以直接配合 esri-leaflet 使用。默认地址走开发服务器代理，代理目标在 <code>.env.local</code> 里配置。
       </p>
     </section>
@@ -38,7 +38,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import L from 'leaflet'
 import { dynamicMapLayer } from 'esri-leaflet'
-import { SMap } from 'leaflet-smap'
+import { SMap } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { tdtKey } from '@/config'
 

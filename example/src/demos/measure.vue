@@ -70,7 +70,7 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { SMap, formatArea, formatLength } from 'leaflet-smap'
+import { SMap, formatArea, formatLength } from 'smap-leaflet'
 import DemoPage from '@/components/DemoPage.vue'
 import { HEFEI } from '@/config'
 

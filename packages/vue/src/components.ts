@@ -11,7 +11,7 @@ import type {
   OverlaysControlOptions,
   PointInput,
   SMap,
-} from 'leaflet-smap'
+} from 'smap-leaflet'
 import { useSMap } from './context'
 
 /*

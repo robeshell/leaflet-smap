@@ -53,7 +53,7 @@ export class ControlManager {
       case 'attribution': {
         const attrControl = L.control.attribution({ prefix: options?.prefix ?? '' })
         attrControl.addAttribution(
-          options?.content ?? 'leaflet-smap &copy; <a href="https://github.com">SMap</a>',
+          options?.content ?? 'smap-leaflet &copy; <a href="https://github.com">SMap</a>',
         )
         control = attrControl
         break

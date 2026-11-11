@@ -1,17 +1,17 @@
-# leaflet-smap-vue
+# smap-leaflet-vue
 
-[`leaflet-smap`](../core/README.md) 的 Vue 3 封装：用组件声明地图、图层和控件，用组合式函数做测量和绘制。
+[`smap-leaflet`](../core/README.md) 的 Vue 3 封装：用组件声明地图、图层和控件，用组合式函数做测量和绘制。
 
 ## 安装
 
 ```bash
-npm install leaflet-smap-vue leaflet-smap leaflet
+npm install smap-leaflet-vue smap-leaflet leaflet
 ```
 
-三者都要装：本包只是一层封装，`leaflet-smap`（>= 2.6.0）、`leaflet`、`vue`（>= 3.3）是 peerDependency。样式来自核心库，在入口引入一次：
+三者都要装：本包只是一层封装，`smap-leaflet`（>= 2.6.0）、`leaflet`、`vue`（>= 3.3）是 peerDependency。样式来自核心库，在入口引入一次：
 
 ```ts
-import 'leaflet-smap/style.css'
+import 'smap-leaflet/style.css'
 ```
 
 ## 快速上手
@@ -28,7 +28,7 @@ import 'leaflet-smap/style.css'
 
 <script setup lang="ts">
 import { ref, shallowRef } from 'vue'
-import { SMapView, SMapControl, SMapGeoJson } from 'leaflet-smap-vue'
+import { SMapView, SMapControl, SMapGeoJson } from 'smap-leaflet-vue'
 
 const center = ref<[number, number]>([31.82, 117.23]) // [纬度, 经度]
 const zoom = ref(12)
@@ -199,8 +199,8 @@ finishEdit() // 保存；finishEdit(false) 放弃
 
 <script setup lang="ts">
 import { shallowRef } from 'vue'
-import type { SMap } from 'leaflet-smap'
-import { SMapView, useMeasure } from 'leaflet-smap-vue'
+import type { SMap } from 'smap-leaflet'
+import { SMapView, useMeasure } from 'smap-leaflet-vue'
 
 const smap = shallowRef<SMap | null>(null)
 const measure = useMeasure({ smap }) // 也可以传 getter：() => viewRef.value?.smap

@@ -5,7 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // 测试直接跑核心库的源码，不依赖它先构建
-      'leaflet-smap': resolve(__dirname, '../core/src/index.ts'),
+      'smap-leaflet': resolve(__dirname, '../core/src/index.ts'),
     },
   },
   test: {

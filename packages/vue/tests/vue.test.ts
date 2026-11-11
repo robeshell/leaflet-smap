@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, isReactive, nextTick, reactive, ref, shallowRef } from 'vue'
 import { mount } from '@vue/test-utils'
 import type { VueWrapper } from '@vue/test-utils'
-import { SMap } from 'leaflet-smap'
+import { SMap } from 'smap-leaflet'
 import {
   SMapCluster,
   SMapContextMenu,

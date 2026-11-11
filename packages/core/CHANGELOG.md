@@ -4,18 +4,18 @@
 
 ## [2.6.0] - 2026-11-11
 
-首个发布到公共 npm 的 2.x 版本。此前的 2.x 以 `@attach/leaflet-smap` 的名字发布在内部仓库。
+首个发布到公共 npm 的版本。此前的 2.x 以 `@attach/leaflet-smap` 的名字发布在内部仓库。
 
 ### 变更
 
-- 包名改为 `leaflet-smap`。从 `@attach/leaflet-smap` 迁移只需要替换导入路径，API 不变。
+- 包名改为 `smap-leaflet`。从 `@attach/leaflet-smap` 迁移只需要替换导入路径，API 不变。
 
 ### 移除
 
 - 内置底图 `SmartMeter.Satellite.Map`。它指向一个不对外的瓦片服务。仍然需要的项目可以自己注册：
 
   ```ts
-  import { registerProvider } from 'leaflet-smap'
+  import { registerProvider } from 'smap-leaflet'
 
   registerProvider('SmartMeter', {
     layers: { Satellite: { Map: '你的瓦片地址/{z}/{x}/{y}.png' } },
@@ -158,7 +158,7 @@
 
 - 入口由 `import { map, utils }` 改为 `import { SMap }`，地图通过 `new SMap(container, options)` 创建，支持同页面多个实例。
 - 配置项改名：`type` → `tileType`，`key` → `tdtKey`；容器改为构造函数的第一个参数。
-- 样式需要单独引入：`import 'leaflet-smap/style.css'`。
+- 样式需要单独引入：`import 'smap-leaflet/style.css'`。
 - `leaflet` 改为 peerDependency，需要由使用方安装。
 - 测量工具改为 `await smap.createMeasure(type, options)`，首次调用时按需加载 leaflet-draw。
 - 图层、控件、服务改为实例上的 `smap.layer` / `smap.control` / `smap.service`，方法名有调整，见 README。

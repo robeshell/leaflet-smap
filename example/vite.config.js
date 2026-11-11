@@ -23,9 +23,9 @@ export default defineConfig(({ mode }) => ({
     alias: {
       '@': resolve(__dirname, 'src'),
       // 直接引用库源码，改完即时生效
-      'leaflet-smap/style.css': resolve(__dirname, '../packages/core/src/style/index.scss'),
-      'leaflet-smap-vue': resolve(__dirname, '../packages/vue/src/index.ts'),
-      'leaflet-smap': resolve(__dirname, '../packages/core/src/index.ts'),
+      'smap-leaflet/style.css': resolve(__dirname, '../packages/core/src/style/index.scss'),
+      'smap-leaflet-vue': resolve(__dirname, '../packages/vue/src/index.ts'),
+      'smap-leaflet': resolve(__dirname, '../packages/core/src/index.ts'),
     },
     // 库源码在 example 之外，它的依赖统一从这里的 node_modules 解析
     dedupe: ['leaflet', 'proj4', 'proj4leaflet', 'mitt', 'vue'],

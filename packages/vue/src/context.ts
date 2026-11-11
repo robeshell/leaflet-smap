@@ -1,6 +1,6 @@
 import { inject, shallowRef, toValue, watch } from 'vue'
 import type { InjectionKey, MaybeRefOrGetter, ShallowRef } from 'vue'
-import type { SMap } from 'leaflet-smap'
+import type { SMap } from 'smap-leaflet'
 
 /** The map of the nearest <SMapView>, null until it is created */
 export const SMAP_KEY: InjectionKey<ShallowRef<SMap | null>> = Symbol('smap')

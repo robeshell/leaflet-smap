@@ -10,7 +10,7 @@
           </svg>
         </span>
         <span class="nav-name">
-          <strong>leaflet-smap</strong>
+          <strong>smap-leaflet</strong>
           <span>v{{ version }} · 示例</span>
         </span>
       </div>
@@ -56,7 +56,7 @@ import { tdtKey } from './config'
 import pkg from '../../packages/core/package.json'
 
 const version = pkg.version
-const install = 'npm i leaflet-smap'
+const install = 'npm i smap-leaflet'
 const navOpen = ref(false)
 const copied = ref(false)
 

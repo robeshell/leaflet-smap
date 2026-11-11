@@ -14,10 +14,10 @@ npm install
 
 ```
 packages/
-  core/            leaflet-smap：核心库
+  core/            smap-leaflet：核心库
     src/           SMap.ts 主类、core/ 各功能模块、plugins/ 底图与坐标、utils/、style/
     tests/
-  vue/             leaflet-smap-vue：Vue 3 封装
+  vue/             smap-leaflet-vue：Vue 3 封装
     src/           SMapView.ts、components.ts、composables.ts、context.ts
     tests/
 example/           示例站（Vue 3），直接引用两个包的源码
@@ -39,7 +39,7 @@ lint、格式化配置和大部分开发依赖放在根目录，两个包共用�
 | `npm run format`               | 用 Prettier 格式化                                              |
 | `npm run test:watch -w <包名>` | 监听运行某个包的测试                                            |
 
-`vue` 包的类型检查依赖 `core` 构建出的类型声明。改了 `core` 的公开类型后，先 `npm run build -w leaflet-smap` 再检查 `vue`（`npm run check` 会自动做）。
+`vue` 包的类型检查依赖 `core` 构建出的类型声明。改了 `core` 的公开类型后，先 `npm run build -w smap-leaflet` 再检查 `vue`（`npm run check` 会自动做）。
 
 ## 约定
 
@@ -63,7 +63,7 @@ lint、格式化配置和大部分开发依赖放在根目录，两个包共用�
 
 ## 发布
 
-两个包各自发布、各自有版本号。以下命令都在根目录运行，`<包名>` 是 `leaflet-smap` 或 `leaflet-smap-vue`。
+两个包各自发布、各自有版本号。以下命令都在根目录运行，`<包名>` 是 `smap-leaflet` 或 `smap-leaflet-vue`。
 
 1. 在该包的 `CHANGELOG.md` 中把「未发布」改成版本号和日期，确认变更条目完整。
 2. 升级版本号：`npm version patch|minor|major -w <包名> --no-git-tag-version`，然后提交。

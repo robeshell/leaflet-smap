@@ -48,7 +48,7 @@ const groups = [
       {
         id: 'vue-components',
         title: 'Vue 组件',
-        desc: '用 leaflet-smap-vue 的组件和组合式函数声明式地写地图。',
+        desc: '用 smap-leaflet-vue 的组件和组合式函数声明式地写地图。',
       },
     ],
   },
