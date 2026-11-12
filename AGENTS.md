@@ -117,4 +117,4 @@ example/                                     示例站，说明见 example/READM
 - **`.npmrc` 可能含个人令牌，已被 git 忽略，绝不能提交**，也不要把其中的内容写进任何文件或日志。
 - **这是公开仓库。** 不要提交内网地址、内部域名、公司项目名或任何只在内部有意义的配置。
 - 不要在代码、文档、测试里写真实的天地图 key 或 Mapbox token，用 `'your-key'` 之类的占位符。
-- **发布（`npm publish`）、推送、打 tag 只在用户明确要求时做。** 两个包各自发布、各自有版本号，发布到公共 npm（`publishConfig.registry`），流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+- **发布（`npm publish`）、推送、打 tag 只在用户明确要求时做。推送 `v*` 或 `vue-v*` 的 tag 会触发 `.github/workflows/release.yml` 直接发布到 npm，等同于发布。** 两个包各自发布、各自有版本号，发布到公共 npm（`publishConfig.registry`），流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
