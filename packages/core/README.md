@@ -5,10 +5,16 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.0-blue" alt="version" />
+  <a href="https://www.npmjs.com/package/smap-leaflet"><img src="https://img.shields.io/npm/v/smap-leaflet" alt="npm" /></a>
   <img src="https://img.shields.io/badge/leaflet-%3E%3D1.8.0-green" alt="leaflet" />
   <img src="https://img.shields.io/badge/typescript-5-blue" alt="typescript" />
   <img src="https://img.shields.io/badge/build-vite%205-purple" alt="vite" />
+</p>
+
+<p align="center">
+  <a href="https://robeshell.github.io/leaflet-smap/"><strong>在线示例</strong></a> ·
+  <a href="https://github.com/robeshell/leaflet-smap">GitHub</a> ·
+  <a href="https://github.com/robeshell/leaflet-smap/blob/main/packages/core/CHANGELOG.md">更新日志</a>
 </p>
 
 ---

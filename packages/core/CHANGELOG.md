@@ -2,6 +2,15 @@
 
 本文件记录每个版本的重要变更，格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循[语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [2.6.1] - 2026-11-12
+
+没有代码变更。
+
+### 变更
+
+- 改由 GitHub Actions 发布，包带有 npm 的来源证明（provenance）。
+- README 增加在线示例的链接。
+
 ## [2.6.0] - 2026-11-11
 
 首个发布到公共 npm 的版本。此前的 2.x 以 `@attach/leaflet-smap` 的名字发布在内部仓库。

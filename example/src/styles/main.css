@@ -117,7 +117,7 @@ code {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 8px 16px;
+  padding: 8px 8px 12px;
 }
 
 .nav-logo {
@@ -156,6 +156,42 @@ code {
   display: block;
   font: 11px/16px var(--mono);
   color: var(--ink-muted);
+}
+
+.nav-links {
+  display: flex;
+  gap: 6px;
+  padding: 0 8px 14px;
+}
+
+.nav-links a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  color: var(--ink-text);
+  text-decoration: none;
+  transition:
+    border-color 0.12s,
+    background 0.12s,
+    color 0.12s;
+}
+
+.nav-links a:hover {
+  border-color: rgba(111, 214, 234, 0.5);
+  background: rgba(111, 214, 234, 0.08);
+  color: #fff;
+}
+
+.nav-links svg {
+  width: 14px;
+  height: 14px;
 }
 
 .nav-scroll {

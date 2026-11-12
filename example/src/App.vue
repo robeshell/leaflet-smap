@@ -14,6 +14,24 @@
           <span>v{{ version }} · 示例</span>
         </span>
       </div>
+      <div class="nav-links">
+        <a href="https://github.com/robeshell/leaflet-smap" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path
+              d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.4c-2.23.48-2.7-.95-2.7-.95-.36-.93-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.33.66.07-.52.28-.87.5-1.07-1.77-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 .2Z"
+            />
+          </svg>
+          GitHub
+        </a>
+        <a href="https://www.npmjs.com/package/smap-leaflet" target="_blank" rel="noopener">npm</a>
+        <a
+          href="https://github.com/robeshell/leaflet-smap/blob/main/packages/core/README.md"
+          target="_blank"
+          rel="noopener"
+        >
+          文档
+        </a>
+      </div>
       <nav class="nav-scroll" aria-label="示例">
         <section v-for="group in groups" :key="group.title">
           <h2>{{ group.title }}</h2>

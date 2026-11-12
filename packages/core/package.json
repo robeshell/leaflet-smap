@@ -1,6 +1,6 @@
 {
   "name": "smap-leaflet",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "基于 Leaflet 的地图库：国内底图、坐标纠偏、测量、绘制与编辑、点聚合、天地图服务",
   "type": "module",
   "main": "dist/smap-leaflet.cjs",

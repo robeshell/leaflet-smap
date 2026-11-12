@@ -1,6 +1,6 @@
 {
   "name": "smap-leaflet-vue",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "smap-leaflet 的 Vue 3 封装：地图组件、图层组件和组合式函数",
   "type": "module",
   "main": "dist/smap-leaflet-vue.cjs",

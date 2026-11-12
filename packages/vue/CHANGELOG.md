@@ -2,6 +2,15 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循[语义化版本](https://semver.org/lang/zh-CN/)。1.0 之前的次版本号升级可能包含不兼容改动。
 
+## [0.4.1] - 2026-11-12
+
+没有代码变更。
+
+### 变更
+
+- 改由 GitHub Actions 发布，包带有 npm 的来源证明（provenance）。
+- README 增加在线示例的链接。
+
 ## [0.4.0] - 2026-11-11
 
 首个发布到公共 npm 的版本。此前以 `@attach/leaflet-smap-vue` 的名字发布在内部仓库。
