@@ -17,11 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-          cache: npm
+          # 发布流程不用依赖缓存：缓存可以被其他工作流写入，不该进到要发布的产物里
+          package-manager-cache: false
       - name: 由 tag 确定要发布的包，并核对版本号
         id: pkg
         run: |
