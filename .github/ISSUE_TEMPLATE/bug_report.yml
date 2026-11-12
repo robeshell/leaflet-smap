@@ -1,0 +1,57 @@
+name: Bug 报告 / Bug report
+description: 库的行为和文档或预期不一致 / Something does not work as documented or expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请先搜索已有的 issue。中文或英文都可以。
+        Please search existing issues first. English or Chinese is fine.
+
+        **不要在 issue 里贴真实的天地图密钥或 Mapbox 令牌。**
+        **Do not paste real TianDiTu keys or Mapbox tokens.**
+  - type: dropdown
+    id: package
+    attributes:
+      label: 包 / Package
+      options:
+        - smap-leaflet
+        - smap-leaflet-vue
+        - 示例站 / Demo site
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本 / Version
+      description: 出问题的包版本，以及 leaflet（和 vue）的版本 / Package version, plus your leaflet (and vue) version
+      placeholder: smap-leaflet 2.6.1, leaflet 1.9.4
+    validations:
+      required: true
+  - type: input
+    id: tile-type
+    attributes:
+      label: 底图 / Base map
+      description: 用的 tileType。位置偏移类的问题必填 / The tileType in use. Required for offset problems
+      placeholder: GaoDe.Normal.Map
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 最小的可运行代码，或者一个能复现的在线示例页面地址 / Minimal runnable code, or a link to a demo page that shows it
+      render: ts
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期与实际 / Expected vs. actual
+      description: 你期望发生什么，实际发生了什么。有报错请贴完整的控制台输出 / What you expected and what happened. Include the full console output if there is an error
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 环境 / Environment
+      description: 浏览器和操作系统 / Browser and OS
+      placeholder: Chrome 142, macOS 26

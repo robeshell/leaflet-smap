@@ -14,6 +14,7 @@
 <p align="center">
   <a href="https://robeshell.github.io/leaflet-smap/"><strong>在线示例</strong></a> ·
   <a href="https://github.com/robeshell/leaflet-smap">GitHub</a> ·
+  <a href="https://github.com/robeshell/leaflet-smap/blob/main/README.en.md">English</a> ·
   <a href="https://github.com/robeshell/leaflet-smap/blob/main/packages/core/CHANGELOG.md">更新日志</a>
 </p>
 

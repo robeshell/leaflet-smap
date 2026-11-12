@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 文档 / Documentation
+    url: https://github.com/robeshell/leaflet-smap/blob/main/packages/core/README.md
+    about: 核心库的完整 API 文档 / Full API reference for the core library
+  - name: 在线示例 / Live demo
+    url: https://robeshell.github.io/leaflet-smap/
+    about: 每个功能的可运行示例和代码 / Runnable demos with source for each feature

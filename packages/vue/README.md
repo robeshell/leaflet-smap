@@ -2,7 +2,7 @@
 
 [`smap-leaflet`](../core/README.md) 的 Vue 3 封装：用组件声明地图、图层和控件，用组合式函数做测量和绘制。
 
-**[在线示例](https://robeshell.github.io/leaflet-smap/)**
+**[在线示例](https://robeshell.github.io/leaflet-smap/)** · [English overview](https://github.com/robeshell/leaflet-smap/blob/main/README.en.md)
 
 ## 安装
 

@@ -1,5 +1,7 @@
 # smap-leaflet
 
+简体中文 | [English](README.en.md)
+
 基于 [Leaflet](https://leafletjs.com/) 的地图库及其 Vue 3 封装：国内底图、坐标自动纠偏、测量、绘制与编辑、点聚合、天地图服务。
 
 [![npm](https://img.shields.io/npm/v/smap-leaflet)](https://www.npmjs.com/package/smap-leaflet)
